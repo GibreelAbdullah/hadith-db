@@ -23,7 +23,18 @@ def generate_collections_json():
 
     collections = []
     for r in cur.execute("SELECT short_name, ar, en FROM collection ORDER BY id"):
-        collections.append({"short_name": r[0], "ar": r[1], "en": r[2]})
+        # Get available languages from the book's database
+        book_db = os.path.join(BOOKS_DIR, f"{r[0]}.db")
+        available_langs = ["ar", "en"]
+        if os.path.exists(book_db):
+            bconn = sqlite3.connect(book_db)
+            row = bconn.execute(
+                "SELECT \"langs$start_end_hadith\" FROM hadith_data WHERE category='collection' LIMIT 1"
+            ).fetchone()
+            if row and row[0]:
+                available_langs = json.loads(row[0])
+            bconn.close()
+        collections.append({"short_name": r[0], "ar": r[1], "en": r[2], "languages": available_langs})
 
     conn.close()
 
@@ -65,10 +76,10 @@ def process_book(db_path, collection_short_name):
     for row in rows:
         _chron, langs_field, book_num, chapter_num, hadith_num, hadith_num_book, ar, en, category = row
 
-        ar_text = ar or ""
-        en_text = en or ""
-        ar_lines.append(ar_text)
-        en_lines.append(en_text)
+        ar_text = (ar or "").replace("\n", "\\n")
+        en_text = (en or "").replace("\n", "\\n")
+        ar_lines.append(f"{category}|{hadith_num or ''}|{ar_text}")
+        en_lines.append(f"{category}|{hadith_num or ''}|{en_text}")
 
         line_index = len(ar_lines) - 1
 
