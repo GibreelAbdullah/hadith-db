@@ -76,6 +76,10 @@ def process_book(db_path, collection_short_name):
     for row in rows:
         _chron, langs_field, book_num, chapter_num, hadith_num, hadith_num_book, ar, en, category = row
 
+        # Standardize hadith numbers - remove spaces
+        if hadith_num:
+            hadith_num = hadith_num.replace(" ", "")
+
         ar_text = (ar or "").replace("\n", "\\n")
         en_text = (en or "").replace("\n", "\\n")
         ar_lines.append(f"{category}|{hadith_num or ''}|{ar_text}")
