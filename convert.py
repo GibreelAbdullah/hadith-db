@@ -43,7 +43,7 @@ def generate_collections_json():
         json.dump({"languages": languages, "collections": collections}, f, ensure_ascii=False)
 
 
-def process_book(db_path, collection_short_name):
+def process_book(db_path, collection_short_name, gradings):
     """Convert a single book database into text files + metadata."""
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
@@ -121,6 +121,22 @@ def process_book(db_path, collection_short_name):
 
         metadata["records"].append(record)
 
+    # Add gradings for this collection
+    coll_gradings = gradings.get(collection_short_name, {})
+    if coll_gradings:
+        # Store as {hadith_num: [[name, grade], ...]}
+        metadata_gradings = {}
+        for rec in metadata["records"]:
+            if rec.get("cat") == "hadith" and rec.get("num"):
+                # Handle composite numbers like "272,273" - check each
+                for num_part in rec["num"].split(","):
+                    if num_part in coll_gradings:
+                        metadata_gradings[rec["num"]] = [
+                            [g["name"], g["grade"]] for g in coll_gradings[num_part]
+                        ]
+                        break
+        metadata["gradings"] = metadata_gradings
+
     # Write text files and compute byte offsets
     ar_content = "\n".join(ar_lines) + "\n"
     en_content = "\n".join(en_lines) + "\n"
@@ -152,7 +168,7 @@ def process_book(db_path, collection_short_name):
     metadata["offsets"]["en"] = en_offsets
     metadata["collection_info"] = collection_info
     metadata["collection_intro"] = collection_intro
-    metadata["books"] = [current_books[k] for k in sorted(current_books.keys(), key=lambda x: int(x) if x and x.isdigit() else 0)]
+    metadata["books"] = [current_books[k] for k in sorted(current_books.keys(), key=lambda x: (int(''.join(c for c in x if c.isdigit()) or '0'), x))]
 
     with open(os.path.join(out_dir, "metadata.json"), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False)
@@ -160,9 +176,68 @@ def process_book(db_path, collection_short_name):
     print(f"  {collection_short_name}: {len(ar_lines)} records, ar={len(ar_bytes)} bytes, en={len(en_bytes)} bytes")
 
 
+GRADINGS_URL = "https://raw.githubusercontent.com/GibreelAbdullah/hadith-api/refs/heads/1/info.json"
+GRADINGS_CACHE = os.path.join(DB_DIR, ".gradings_cache.json")
+
+# Map info.json collection names to our collection names
+COLLECTION_NAME_MAP = {
+    "abudawud": "abudawud",
+    "ibnmajah": "ibn_majah",
+    "malik": "malik",
+    "nasai": "nasai",
+    "tirmidhi": "tirmidhi",
+}
+
+def arabicnumber_to_hadith_num(num):
+    """Convert info.json arabicnumber (e.g., 384.2) to our format (e.g., 384b)."""
+    if isinstance(num, int):
+        return str(num)
+    s = str(num)
+    if "." in s:
+        base, suffix = s.split(".", 1)
+        # .2 -> b, .3 -> c, etc.
+        suffix_int = int(suffix)
+        if suffix_int >= 2:
+            return base + chr(ord("a") + suffix_int - 1)
+    return s
+
+
+def load_gradings():
+    """Load gradings from hadith-api info.json, using a local cache."""
+    import urllib.request
+
+    if not os.path.exists(GRADINGS_CACHE):
+        print(f"  Downloading gradings from {GRADINGS_URL}...")
+        urllib.request.urlretrieve(GRADINGS_URL, GRADINGS_CACHE)
+
+    data = json.load(open(GRADINGS_CACHE, encoding="utf-8"))
+
+    # Build a lookup: {our_collection_name: {hadith_num_str: [grades]}}
+    gradings = {}
+    for info_name, our_name in COLLECTION_NAME_MAP.items():
+        if info_name not in data:
+            continue
+        coll_gradings = {}
+        for h in data[info_name]["hadiths"]:
+            if not h.get("grades"):
+                continue
+            arabic_num = h.get("arabicnumber")
+            if arabic_num is None:
+                continue
+            hadith_num = arabicnumber_to_hadith_num(arabic_num)
+            coll_gradings[hadith_num] = h["grades"]
+        gradings[our_name] = coll_gradings
+        print(f"  Loaded {len(coll_gradings)} gradings for {our_name}")
+
+    return gradings
+
+
 def main():
     print("Generating collections.json...")
     generate_collections_json()
+
+    print("Loading gradings from hadith-api info.json...")
+    gradings = load_gradings()
 
     print("Processing books...")
     conn = sqlite3.connect(MASTER_DB)
@@ -172,7 +247,7 @@ def main():
     for coll in collections:
         db_path = os.path.join(BOOKS_DIR, f"{coll}.db")
         if os.path.exists(db_path):
-            process_book(db_path, coll)
+            process_book(db_path, coll, gradings)
         else:
             print(f"  WARNING: {db_path} not found, skipping")
 
