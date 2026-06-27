@@ -48,10 +48,17 @@ def process_book(db_path, collection_short_name, gradings):
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
 
+    # Detect language columns dynamically
+    table_info = cur.execute("PRAGMA table_info(hadith_data)").fetchall()
+    all_columns = [col[1] for col in table_info]
+    known_non_lang = {"chronology", "langs$start_end_hadith", "book_number", "chapter_number", "hadith_num", "hadith_num_book", "category"}
+    lang_columns = [c for c in all_columns if c not in known_non_lang]
+
+    lang_cols_sql = ", ".join(f'"{c}"' for c in lang_columns)
     rows = cur.execute(
-        'SELECT chronology, "langs$start_end_hadith", book_number, chapter_number, '
-        "hadith_num, hadith_num_book, ar, en, category "
-        "FROM hadith_data ORDER BY chronology"
+        f'SELECT chronology, "langs$start_end_hadith", book_number, chapter_number, '
+        f"hadith_num, hadith_num_book, {lang_cols_sql}, category "
+        f"FROM hadith_data ORDER BY chronology"
     ).fetchall()
     conn.close()
 
@@ -59,52 +66,61 @@ def process_book(db_path, collection_short_name, gradings):
     os.makedirs(out_dir, exist_ok=True)
 
     # Build text files and metadata
-    ar_lines = []
-    en_lines = []
+    lines_by_lang = {lang: [] for lang in lang_columns}
     metadata = {
         "collection": collection_short_name,
-        "languages": ["ar", "en"],
+        "languages": lang_columns,
         "books": [],
-        "records": [],  # one entry per line: {category, book, chapter, hadith_num, hadith_num_book}
-        "offsets": {"ar": [], "en": []},
+        "records": [],
+        "offsets": {lang: [] for lang in lang_columns},
     }
 
-    collection_info = {"ar": "", "en": ""}
-    collection_intro = {"ar": "", "en": ""}
-    current_books = {}  # book_number -> {ar, en, start_hadith, end_hadith, chapters: [...]}
+    collection_info = {lang: "" for lang in lang_columns}
+    collection_intro = {lang: "" for lang in lang_columns}
+    current_books = {}
 
     for row in rows:
-        _chron, langs_field, book_num, chapter_num, hadith_num, hadith_num_book, ar, en, category = row
+        # Row structure: chronology, langs_field, book_num, chapter_num, hadith_num, hadith_num_book, *lang_texts, category
+        _chron = row[0]
+        langs_field = row[1]
+        book_num = row[2]
+        chapter_num = row[3]
+        hadith_num = row[4]
+        hadith_num_book = row[5]
+        lang_texts = {lang_columns[i]: row[6 + i] for i in range(len(lang_columns))}
+        category = row[6 + len(lang_columns)]
 
         # Standardize hadith numbers - remove spaces
         if hadith_num:
             hadith_num = hadith_num.replace(" ", "")
 
-        ar_text = (ar or "").replace("\n", "\\n")
-        en_text = (en or "").replace("\n", "\\n")
-        ar_lines.append(f"{category}|{hadith_num or ''}|{ar_text}")
-        en_lines.append(f"{category}|{hadith_num or ''}|{en_text}")
+        for lang in lang_columns:
+            text = (lang_texts[lang] or "").replace("\n", "\\n")
+            lines_by_lang[lang].append(f"{category}|{hadith_num or ''}|{text}")
 
-        line_index = len(ar_lines) - 1
+        line_index = len(lines_by_lang[lang_columns[0]]) - 1
 
         record = {"line": line_index, "cat": category}
 
         if category == "collection":
-            collection_info = {"ar": ar_text, "en": en_text}
-            available_langs = json.loads(langs_field) if langs_field else ["ar", "en"]
+            for lang in lang_columns:
+                collection_info[lang] = (lang_texts[lang] or "").replace("\n", "\\n")
+            available_langs = json.loads(langs_field) if langs_field else lang_columns
             metadata["languages"] = available_langs
         elif category == "collection_intro":
-            collection_intro = {"ar": ar_text, "en": en_text}
+            for lang in lang_columns:
+                collection_intro[lang] = (lang_texts[lang] or "").replace("\n", "\\n")
         elif category == "book":
             hadith_range = json.loads(langs_field) if langs_field else [0, 0]
             record["book"] = book_num
-            current_books[book_num] = {
+            book_entry = {
                 "number": book_num,
-                "ar": ar_text,
-                "en": en_text,
                 "hadith_start": hadith_range[0],
                 "hadith_end": hadith_range[1],
             }
+            for lang in lang_columns:
+                book_entry[lang] = (lang_texts[lang] or "").replace("\n", "\\n")
+            current_books[book_num] = book_entry
         elif category == "book_intro":
             record["book"] = book_num
         elif category == "chapter":
@@ -138,42 +154,42 @@ def process_book(db_path, collection_short_name, gradings):
         metadata["gradings"] = metadata_gradings
 
     # Write text files and compute byte offsets
-    ar_content = "\n".join(ar_lines) + "\n"
-    en_content = "\n".join(en_lines) + "\n"
+    for lang in lang_columns:
+        content = "\n".join(lines_by_lang[lang]) + "\n"
+        content_bytes = content.encode("utf-8")
+        with open(os.path.join(out_dir, f"{lang}.txt"), "wb") as f:
+            f.write(content_bytes)
 
-    ar_bytes = ar_content.encode("utf-8")
-    en_bytes = en_content.encode("utf-8")
+        # Compute byte offsets for each line
+        offsets = []
+        offset = 0
+        for line in lines_by_lang[lang]:
+            offsets.append(offset)
+            offset += len(line.encode("utf-8")) + 1
+        offsets.append(offset)  # end sentinel
+        metadata["offsets"][lang] = offsets
 
-    with open(os.path.join(out_dir, "ar.txt"), "wb") as f:
-        f.write(ar_bytes)
-    with open(os.path.join(out_dir, "en.txt"), "wb") as f:
-        f.write(en_bytes)
-
-    # Compute byte offsets for each line
-    ar_offsets = []
-    offset = 0
-    for line in ar_lines:
-        ar_offsets.append(offset)
-        offset += len(line.encode("utf-8")) + 1  # +1 for \n
-    ar_offsets.append(offset)  # end sentinel
-
-    en_offsets = []
-    offset = 0
-    for line in en_lines:
-        en_offsets.append(offset)
-        offset += len(line.encode("utf-8")) + 1
-    en_offsets.append(offset)
-
-    metadata["offsets"]["ar"] = ar_offsets
-    metadata["offsets"]["en"] = en_offsets
     metadata["collection_info"] = collection_info
     metadata["collection_intro"] = collection_intro
     metadata["books"] = [current_books[k] for k in sorted(current_books.keys(), key=lambda x: (int(''.join(c for c in x if c.isdigit()) or '0'), x))]
 
+    # Supplement book names from sections file if available
+    sections_path = os.path.join(DB_DIR, "sections", f"{collection_short_name}.min.json")
+    if os.path.exists(sections_path):
+        sections_data = json.load(open(sections_path, encoding="utf-8"))
+        section_books = sections_data.get("books", {})
+        for book in metadata["books"]:
+            sec = section_books.get(str(book["number"]), {})
+            if not book.get("ar") or book["ar"] == "":
+                book["ar"] = sec.get("ara-name", "")
+            if not book.get("en") or book["en"] == "":
+                book["en"] = sec.get("eng-name", "")
+
     with open(os.path.join(out_dir, "metadata.json"), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False)
 
-    print(f"  {collection_short_name}: {len(ar_lines)} records, ar={len(ar_bytes)} bytes, en={len(en_bytes)} bytes")
+    sizes = ", ".join(f"{lang}={len(('\n'.join(lines_by_lang[lang]) + '\n').encode('utf-8'))} bytes" for lang in lang_columns)
+    print(f"  {collection_short_name}: {len(lines_by_lang[lang_columns[0]])} records, {sizes}")
 
 
 GRADINGS_URL = "https://raw.githubusercontent.com/GibreelAbdullah/hadith-api/refs/heads/1/info.json"
