@@ -38,9 +38,53 @@ def generate_collections_json():
 
     conn.close()
 
+    # Define categories
+    categories = [
+        {
+            "id": "kutub_al_sittah",
+            "name": {"ar": "الكتب الستة", "en": "The Six Canonical Books", "ur": "صحاح ستہ", "tr": "Altı Büyük Hadis Kitabı", "bn": "কুতুবুস সিত্তাহ", "fr": "Les Six Recueils Canoniques", "id": "Enam Kitab Pokok Hadis", "ru": "Шесть канонических сборников"},
+            "collections": ["bukhari", "muslim", "nasai", "abudawud", "tirmidhi", "ibn_majah"]
+        },
+        {
+            "id": "kutub_al_aimmah",
+            "name": {"ar": "كتب الأئمة", "en": "Books of the Imams", "ur": "کتب الائمہ", "tr": "İmamların Kitapları", "bn": "ইমামদের কিতাব", "fr": "Livres des Imams", "id": "Kitab Para Imam", "ru": "Книги имамов"},
+            "collections": ["malik", "musnad_ahmad", "abuhanifa"]
+        },
+        {
+            "id": "al_ahkam_wal_fiqh",
+            "name": {"ar": "الأحكام والفقه", "en": "Jurisprudence & Rulings", "ur": "احکام و فقہ", "tr": "Hükümler ve Fıkıh", "bn": "আহকাম ও ফিকহ", "fr": "Jurisprudence et Règles", "id": "Hukum dan Fikih", "ru": "Законоположения и фикх"},
+            "collections": ["bulugh_almaram", "mishkat"]
+        },
+        {
+            "id": "al_adab_wal_fadhail",
+            "name": {"ar": "الآداب والفضائل", "en": "Manners & Virtues", "ur": "آداب و فضائل", "tr": "Edeb ve Faziletler", "bn": "আদব ও ফযীলত", "fr": "Convenances et Vertus", "id": "Adab dan Keutamaan", "ru": "Нравы и достоинства"},
+            "collections": ["riyad_assalihin", "aladab_almufrad"]
+        },
+        {
+            "id": "ash_shamail",
+            "name": {"ar": "الشمائل", "en": "Prophetic Character", "ur": "شمائل نبوی", "tr": "Peygamber Ahlâkı", "bn": "নবী চরিত্র", "fr": "Les Caractéristiques Prophétiques", "id": "Akhlak Nabi", "ru": "Пророческий нрав"},
+            "collections": ["shamail"]
+        },
+        {
+            "id": "ad_dua_wal_adhkar",
+            "name": {"ar": "الدعاء والأذكار", "en": "Supplications & Remembrance", "ur": "دعا و اذکار", "tr": "Dua ve Zikirler", "bn": "দু'আ ও যিকির", "fr": "Invocations et Rappels", "id": "Doa dan Dzikir", "ru": "Мольбы и поминания"},
+            "collections": ["hisn_almuslim"]
+        },
+        {
+            "id": "al_arbaʿiniyyat",
+            "name": {"ar": "الأربعينيات", "en": "Forty Hadith Collections", "ur": "اربعینیات", "tr": "Kırk Hadis Derlemeleri", "bn": "চল্লিশ হাদিস সংকলন", "fr": "Les Quarante Hadiths", "id": "Kumpulan Empat Puluh Hadits", "ru": "Сборники сорока хадисов"},
+            "collections": ["nawawi", "qudsi", "dehlawi"]
+        },
+        {
+            "id": "majami_ukhra",
+            "name": {"ar": "مجاميع أخرى", "en": "Other Collections", "ur": "دیگر مجموعے", "tr": "Diğer Derlemeler", "bn": "অন্যান্য সংকলন", "fr": "Autres Recueils", "id": "Koleksi Lainnya", "ru": "Другие сборники"},
+            "collections": ["maanialathaar", "fadail_ayaat_suar"]
+        }
+    ]
+
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     with open(os.path.join(OUTPUT_DIR, "collections.json"), "w", encoding="utf-8") as f:
-        json.dump({"languages": languages, "collections": collections}, f, ensure_ascii=False)
+        json.dump({"languages": languages, "collections": collections, "categories": categories}, f, ensure_ascii=False)
 
 
 def process_book(db_path, collection_short_name, gradings):
