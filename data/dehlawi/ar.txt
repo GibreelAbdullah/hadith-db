@@ -1,5 +1,5 @@
 collection||Forty Hadith of Shah Waliullah Dehlawi
-book||
+book||Forty Hadith of Shah Waliullah Dehlawi
 hadith|1|لَیْسَ الْخَبَرُ کَالْمُعَایَنَةِ
 hadith|2|الْحَرْبُ خُدَعَةٌ
 hadith|3|الْمُسْلِمُ مِرْآةُ الْمُسْلِمِ

@@ -96,6 +96,13 @@ def process_book(db_path, collection_short_name, gradings):
 
         for lang in lang_columns:
             text = (lang_texts[lang] or "").replace("\n", "\\n")
+            # For structural rows, fall back to another language if empty
+            if not text and category in ("collection", "book", "book_intro", "chapter", "chapter_intro"):
+                for fallback in ["en", "ar"] + lang_columns:
+                    fb_text = (lang_texts.get(fallback) or "").replace("\n", "\\n")
+                    if fb_text:
+                        text = fb_text
+                        break
             lines_by_lang[lang].append(f"{category}|{hadith_num or ''}|{text}")
 
         line_index = len(lines_by_lang[lang_columns[0]]) - 1
@@ -104,12 +111,26 @@ def process_book(db_path, collection_short_name, gradings):
 
         if category == "collection":
             for lang in lang_columns:
-                collection_info[lang] = (lang_texts[lang] or "").replace("\n", "\\n")
+                text = (lang_texts[lang] or "").replace("\n", "\\n")
+                if not text:
+                    for fallback in ["en", "ar"] + lang_columns:
+                        fb = (lang_texts.get(fallback) or "").replace("\n", "\\n")
+                        if fb:
+                            text = fb
+                            break
+                collection_info[lang] = text
             available_langs = json.loads(langs_field) if langs_field else lang_columns
             metadata["languages"] = available_langs
         elif category == "collection_intro":
             for lang in lang_columns:
-                collection_intro[lang] = (lang_texts[lang] or "").replace("\n", "\\n")
+                text = (lang_texts[lang] or "").replace("\n", "\\n")
+                if not text:
+                    for fallback in ["en", "ar"] + lang_columns:
+                        fb = (lang_texts.get(fallback) or "").replace("\n", "\\n")
+                        if fb:
+                            text = fb
+                            break
+                collection_intro[lang] = text
         elif category == "book":
             hadith_range = json.loads(langs_field) if langs_field else [0, 0]
             record["book"] = book_num
@@ -119,7 +140,14 @@ def process_book(db_path, collection_short_name, gradings):
                 "hadith_end": hadith_range[1],
             }
             for lang in lang_columns:
-                book_entry[lang] = (lang_texts[lang] or "").replace("\n", "\\n")
+                text = (lang_texts[lang] or "").replace("\n", "\\n")
+                if not text:
+                    for fallback in ["en", "ar"] + lang_columns:
+                        fb = (lang_texts.get(fallback) or "").replace("\n", "\\n")
+                        if fb:
+                            text = fb
+                            break
+                book_entry[lang] = text
             current_books[book_num] = book_entry
         elif category == "book_intro":
             record["book"] = book_num

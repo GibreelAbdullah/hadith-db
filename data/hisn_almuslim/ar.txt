@@ -1,6 +1,6 @@
 collection||حصن المسلم
 book||حصن المسلم
-book_intro||
+book_intro|| Introduction \nSurely all praise is for Allah. We praise Him, seek His help, and ask His forgiveness. We seek refuge in Him from the evil of our own souls and from the wickedness of our deeds. Whomever He guides then nothing ... (more)\n\n Merits of Dhikr
 chapter||أذكار الاستيقاظ من النوم
 hadith|1|<text>الحَمْـدُ لِلّهِ الّذي أَحْـيانا بَعْـدَ ما أَماتَـنا وَإليه النُّـشور</text>
 hadith|2|<text>لا إلهَ إلاّ اللّهُ وَحْـدَهُ لا شَـريكَ له، لهُ المُلـكُ ولهُ الحَمـد، وهوَ على كلّ شيءٍ قدير، سُـبْحانَ اللهِ، والحمْـدُ لله، ولا إلهَ إلاّ اللهُ واللهُ أكبَر، وَلا حَولَ وَلا قوّة إلاّ باللّهِ العليّ العظيم، رَبِّ اغْفرْ لي</text>

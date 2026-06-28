@@ -1,5 +1,5 @@
 collection||Forty Hadith of Shah Waliullah Dehlawi
-book||
+book||Forty Hadith of Shah Waliullah Dehlawi
 hadith|1|La nouvelle (rapportée) n’est pas comme ce qu’on voit (de ses propres yeux)
 hadith|2|La guerre est tromperie
 hadith|3|Le musulman est le miroir du musulman

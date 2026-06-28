@@ -2331,7 +2331,7 @@ hadith|1430|<qbl>It was narrated that Abu Hurairah said:</qbl><text>"I went out 
 hadith|1431|<qbl>It was narrated from Abu Hurairah that:</qbl><text>The Messenger of Allah (ﷺ) said: "On Friday, there is an hour when, if a Muslim slave asks Allah for something at that time, He will give it to him."</text>
 hadith|1432|<qbl>It was narrated that Abu Hurairah said:</qbl><text>"Abu Al-Qasim (ﷺ) said: 'On Friday, there is an hour when, if a Muslim slave stands in prayer and asks Allah for something at that time, He will give it to him.'" He was reducing it: lessening it.</text>
 book||The Book of Shortening the Prayer When Traveling
-chapter||
+chapter||باب
 hadith|1433|<qbl>It was narrated that Ya'la bin Umayyah said:</qbl><text>"I said to 'Umar bin Al-Khattab: 'There is no sin on you if you shorten salah and if you fear that the disbelievers may put you in trial (attack you). But now the people are safe.' 'Umar said: 'I wondered the same thing, so I asked the Messenger of Allah (ﷺ) about that and he said: This is a favor from Allah (SWT) to you, so accept His favor."</text>
 hadith|1434|<qbl>It was narrated from Umayyah bin 'Abdullah bin Khalid that:</qbl><text>He said to 'Abdullah bin 'Umar: "We find (mention of) prayer when one is at home (i.e., not traveling) and prayer at times of fear in the Qur'an, but we do not find any mention in the Qur'an of prayer when traveling. Ibn Umar said to him: 'O son of my brother, Allah (SWT) send Muhammad (ﷺ) to us when we did not know anything, and all we should do is to do that which we saw Muhammad (ﷺ) doing.'"</text>
 hadith|1435|<qbl>It was narrated from Ibn 'Abbas that:</qbl><text>The Messenger of Allah (ﷺ) set out from Makkah to Al-Madinah, fearing nothing but the Lord of the worlds, and praying two rak'ahs.</text>
@@ -2507,7 +2507,7 @@ hadith|1553|<qbl>It was narrated that Sahl bin Abi Hathmah said concerning the f
 hadith|1554|<qbl>Jabir bin 'Abdullah narrated that :</qbl><text>The Messenger of Allah (ﷺ) led his companions in offering the fear prayer. One group prayed with him while the other was facing the enemy. He led them in praying two rak'ahs, then they went and took the place of the others, and the others came and he led them in praying two rak'ahs, then he said the taslim.</text>
 hadith|1555|<qbl>It was narrated from Abu Bakrah that:</qbl><text>The Prophet (ﷺ) offered the fear prayer with those who were behind him, praying two rak'ahs (with them) and two rak'ahs with those who came after them, so the Prophet (ﷺ) prayed four rak'ahs and the others each prayed two rak'ahs.</text>
 book||The Book of the Prayer for the Two 'Eids
-chapter||
+chapter||باب
 hadith|1556|<qbl>It was narrated that Anas bin Malik said:</qbl><text>"The people of the Jahiliyyah had two days each year when they would play. When the Messenger of Allah (ﷺ) came to Al-Madinah he said: 'You had two days when you would play, but Allah (SWT) has given Muslims something instead that is better than them: the day of Al-Fitr and the day of Al-Adha.'"</text>
 chapter||Going out for the two 'Eids the (morning of the) following day
 hadith|1557|<qbl>It was narrated from 'Umair bin Anas from his paternal uncles, that :</qbl><text>Some people saw the crescent moon and came to the Prophet (ﷺ), and he told them to break their fast after the sun has risen and to go out for 'Eid the (morning of the) following day.</text>
@@ -4417,7 +4417,7 @@ hadith|2915|<qbl>It was narrated the Usmah bin Zaid said:</qbl><text>"I entered 
 hadith|2916|<qbl>It was narrated that Usmah said:</qbl><text>"The Messenger of Allah came out of the House and prayed two Rakahs in front of the Kabah, then he said: 'This is the Qiblah.'"</text>
 hadith|2917|<qbl>It was narrated that Ata said:</qbl><text>"I head Ibn Abbas sya: 'Usmah bin Zaid told me that the Prophet (ﷺ) entered the YHouse, and supplicated in all its corner, but he did not pray inside unitl he came out; when he came out he prayed two Rakahs in front of the Kabah.'"</text>
 hadith|2918|<qbl>Muhammad bin Abdullah bin As-Saib narrated from his father that:</qbl><text>he used to lead Ib Abbas and make him stand at the third side (of the Kabah next to the corner that is next to the stone, in between the stone and the door. Ibn Abbas said: "Have you head that the Messenger of Allah used to pray here?" He said: "Yes." So he went forward and prayed. (Daif) Chaper 134. The Virtue Of Circumambulationg The House, Which Is From The Book Al-Mujtaba About Hajj</text>
-chapter||
+chapter||باب ذِكْرِ الْفَضْلِ فِي الطَّوَافِ بِالْبَيْتِ
 hadith|2919|<qbl>It was narrated from Abdullah bin Ubaid bin Umair that a man said:</qbl><text>"O Abu abdur-Rahman, why do I only see you touching these two corners?" He said: "I heard the Messenger of Allah say: 'Touching them erases sins.' And I head him say: 'whoever circumambulates seven times, it is like freeing a slave.'"</text>
 chapter||Speaking During Tawaf
 hadith|2920|<qbl>It was narrated from Ibn Abbas:</qbl><text>That the Prophet (ﷺ) passed by while he was circumambulating the Kabah with a man who was leading another with a ring in his nose. The Messenger of Allah stopped him with his hand then told him to lead him by his hand.</text>
@@ -8336,7 +8336,7 @@ hadith|5728|<qbl>It was narrated that Makhul said:</qbl><text>"Every intoxicant 
 chapter||What Kind of Juices are Permissible to Drink and What Kinds are Not
 hadith|5729|<qbl>It was narrated that Abu Thabit Ath-Tha'labi said:</qbl><text>"I was with Ibn 'Abbas when a man came to him and asked him about juice. He said: 'Drink that which is fresh.' He said: 'I cooked a drink on the fire and I am not sure about it.' He said: 'Did you drink it before you cooked it?' He said: 'No.' He said: 'Fire does not make permissible something that is forbidden.'" (Sahih Mawquf)</text>
 hadith|5730|<qbl>'Ata' said:</qbl><text>"I heard Ibn 'Abbas say: 'By Allah, fire does not make anything permissible or forbidden.'" He said: "Then he explained what he meant by 'it does not make permissible' as referring to what they said about At-Tila' (thickened grape juice), and he explained what he said about 'it does not make forbidden' as referring to performing Wudu' after eating something that has been touched by fire."</text>
-chapter||
+chapter||باب الْوُضُوءِ مِمَّا مَسَّتِ النَّارُ
 hadith|5731|<qbl>It was narrated that Sa'eed bin Al-Musayyab said:</qbl><text>"Drink juice so long as it does not have any foam."</text>
 hadith|5732|<qbl>It was narrated that Hisham bin 'A'idh Al-Asadi said:</qbl><text>"I asked Ibrahim about juice and he said: 'Drink it, unless it bubbles, so long as it doesn't change.'"</text>
 hadith|5733|<qbl>It was narrated from 'Ata' that :</qbl><text>He said, concerning juice: "Drink it unless it is bubbling."</text>

@@ -1452,7 +1452,7 @@ hadith|1438|<text>حَدَّثَنَا أَسْوَدُ بْنُ عَامِرٍ�
 hadith|1436|
 hadith|1437|
 hadith|1438|
-book||
+book||Musnad Abu Ishaq Sa'd bin Abi Waqqas
 chapter||
 hadith|1439|
 hadith|1440|
@@ -1640,7 +1640,7 @@ hadith|1620|
 hadith|1621|
 hadith|1622|
 hadith|1623|
-book||
+book||Musnad of Sa'eed bin Zaid bin 'Amr bin Nufail
 chapter||
 hadith|1625|
 hadith|1626|
@@ -1672,7 +1672,7 @@ hadith|1651|
 hadith|1652|
 hadith|1653|
 hadith|1654|
-book||
+book||Musnad of 'Abdur-Rahman bin 'Awf az-Zuhri
 chapter||
 hadith|1655|
 hadith|1656|
@@ -1709,7 +1709,7 @@ hadith|1686|
 hadith|1687|
 hadith|1688|
 hadith|1689|
-book||
+book||Hadeeth of Abu 'Ubaidah bin al-Jarrah, whose name was 'Amir bin Abdullah
 chapter||
 hadith|1690|
 hadith|1691|
@@ -1723,7 +1723,7 @@ hadith|1698|
 hadith|1699|
 hadith|1700|
 hadith|1701|
-book||
+book||The Hadeeth of 'Abdur-Rahman bin Abi Bakr
 chapter||
 hadith|1702|
 hadith|1703|
@@ -1737,17 +1737,17 @@ hadith|1710|
 hadith|1711|
 hadith|1712|
 hadith|1713|
-book||
+book||Hadeeth of Zaid bin Kharijah
 chapter||
 hadith|1714|
-book||
+book||The Hadeeth of al-Harith bin Khazamah
 chapter||
 hadith|1715|
-book||
+book||Hadeeth of Sa'd, the freed slave of Abu Bakr
 chapter||
 hadith|1716|
 hadith|1717|
-book||
+book||The Musnad of Ahlul-Bayt & Hadeeth of al-Hasan bin 'Ali bin Abu Talib
 chapter||
 hadith|1718|
 hadith|1719|
@@ -1761,7 +1761,7 @@ hadith|1726|
 hadith|1727|
 hadith|1728|
 hadith|1729|
-book||
+book||The hadeeth of Al-Husain bin 'Ali
 chapter||
 hadith|1730|
 hadith|1731|
@@ -1771,14 +1771,14 @@ hadith|1734|
 hadith|1735|
 hadith|1736|
 hadith|1737|
-book||
+book||Hadeeth of 'Aqeel bin Abi Talib
 chapter||
 hadith|1738|
 hadith|1739|
-book||
+book||Hadeeth of Ja'far bin Abi Talib & It is Hadeeth of al-Hijrah (migration)
 chapter||
 hadith|1740|
-book||
+book||Hadeeth of 'Abdullah bin Ja'far bin Abi Talib
 chapter||
 hadith|1741|
 hadith|1742|
@@ -1802,7 +1802,7 @@ hadith|1759|
 hadith|1760|
 hadith|1761|
 hadith|1762|
-book||
+book||Musnad Bani Hashim (Hadeeth of al-'Abbas bin 'Abdul-Muttalib from the  Prophet)
 chapter||
 hadith|1763|
 hadith|1764|
@@ -1831,7 +1831,7 @@ hadith|1786|
 hadith|1787|
 hadith|1788|
 hadith|1789|
-book||
+book||Musnad of al-Fadl bin 'Abbas & narrating from the Prophet
 chapter||
 hadith|1790|
 hadith|1791|
@@ -1877,14 +1877,14 @@ hadith|1830|
 hadith|1831|
 hadith|1832|
 hadith|1833|
-book||
+book||Hadeeth of Tammam bin al-'Abbas bin 'Abdul-Muttalib from the Prophet
 chapter||
 hadith|1834|
 hadith|1835|
-book||
+book||Hadeeth of 'Ubaidullah bin al-'Abbas & from the Prophet
 chapter||
 hadith|1836|
-book||
+book||Musnad of 'Abdullah bin al-'Abbas bin 'Abdul-Muttalib from the Prophet
 chapter||
 hadith|1837|
 hadith|1838|
@@ -3575,7 +3575,7 @@ hadith|3522|
 hadith|3523|
 hadith|3524|
 hadith|3525|
-book||
+book||Musnad of Abdullah bin Mas'ood
 chapter||
 hadith|3526|
 hadith|3527|
