@@ -6,14 +6,13 @@ on:
     paths:
       - 'books/**'
       - 'master/**'
+      - 'sections/**'
       - 'convert.py'
       - 'build_search_index.mjs'
       - '.github/workflows/**'
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
 
 jobs:
   generate:
@@ -37,29 +36,13 @@ jobs:
       - name: Run conversion script
         run: python3 convert.py
 
+      - name: Build search index
+        run: node build_search_index.mjs
+
       - name: Commit and push generated data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git diff --cached --quiet || git commit -m "chore: regenerate data"
+          git diff --cached --quiet || git commit -m "chore: regenerate data and search index"
           git push
-
-      - name: Build search index
-        run: node build_search_index.mjs
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: data/pagefind
-
-  deploy-search:
-    needs: generate
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
