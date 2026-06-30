@@ -1,10 +1,11 @@
 import * as pagefind from "pagefind";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, "data");
+const OUTPUT_DIR = join(DATA_DIR, "pagefind");
 
 async function main() {
   const collectionsData = JSON.parse(readFileSync(join(DATA_DIR, "collections.json"), "utf-8"));
@@ -22,30 +23,23 @@ async function main() {
       continue;
     }
 
-    // Read text files for each language
     const textByLang = {};
     for (const lang of meta.languages) {
       try {
         textByLang[lang] = readFileSync(join(DATA_DIR, coll.short_name, `${lang}.txt`), "utf-8").split("\n");
-      } catch {
-        // Language file not available
-      }
+      } catch {}
     }
 
-    // Index each hadith
     for (const rec of meta.records) {
       if (rec.cat !== "hadith") continue;
 
-      // Get text content from all languages
       const contentParts = [];
       for (const lang of meta.languages) {
         const lines = textByLang[lang];
         if (!lines) continue;
         const line = lines[rec.line] || "";
-        // Strip "category|num|" prefix
         const secondPipe = line.indexOf("|", line.indexOf("|") + 1);
         const text = secondPipe !== -1 ? line.slice(secondPipe + 1) : line;
-        // Strip HTML tags and unescape
         const clean = text.replace(/<[^>]*>/g, "").replace(/\\n/g, " ");
         if (clean) contentParts.push(clean);
       }
@@ -75,13 +69,13 @@ async function main() {
       totalIndexed++;
     }
 
-    console.log(`  ${coll.short_name}: indexed ${meta.records.filter(r => r.cat === "hadith").length} hadiths`);
+    console.log(`  ${coll.short_name}: ${meta.records.filter(r => r.cat === "hadith").length} hadiths`);
   }
 
-  console.log(`\nTotal indexed: ${totalIndexed}`);
+  console.log(`\nTotal: ${totalIndexed} hadiths indexed`);
 
-  await index.writeFiles({ outputPath: join(DATA_DIR, "pagefind") });
-  console.log("Pagefind index written to data/pagefind/");
+  await index.writeFiles({ outputPath: OUTPUT_DIR });
+  console.log(`Index written to ${OUTPUT_DIR}`);
 
   await pagefind.close();
 }
