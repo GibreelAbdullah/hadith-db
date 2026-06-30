@@ -34,14 +34,18 @@ async function main() {
       if (rec.cat !== "hadith") continue;
 
       const contentParts = [];
-      for (const lang of meta.languages) {
+      // Only index English (or Arabic as fallback) to keep fragments small
+      for (const lang of ["en", "ar"]) {
         const lines = textByLang[lang];
         if (!lines) continue;
         const line = lines[rec.line] || "";
         const secondPipe = line.indexOf("|", line.indexOf("|") + 1);
         const text = secondPipe !== -1 ? line.slice(secondPipe + 1) : line;
         const clean = text.replace(/<[^>]*>/g, "").replace(/\\n/g, " ");
-        if (clean) contentParts.push(clean);
+        if (clean) {
+          contentParts.push(clean);
+          break; // Only use one language for content
+        }
       }
 
       if (contentParts.length === 0) continue;
@@ -50,9 +54,12 @@ async function main() {
       const book = meta.books.find(b => b.number === rec.book);
       const bookName = book ? (book.en || book.ar || `Book ${rec.book}`) : "";
 
+      // Boost collection name and hadith number by repeating them
+      const boostText = `${collName} ${rec.num} `.repeat(10);
+
       await index.addCustomRecord({
         url: `/${coll.short_name}:${rec.num}`,
-        content: contentParts.join(" "),
+        content: boostText + contentParts.join(" "),
         language: "en",
         meta: {
           title: `${collName} : ${rec.num}`,
@@ -76,10 +83,6 @@ async function main() {
 
   await index.writeFiles({ outputPath: OUTPUT_DIR });
   console.log(`Index written to ${OUTPUT_DIR}`);
-
-  // Remove fragments to reduce size (we don't need excerpts - hadith text is loaded via range requests)
-  rmSync(join(OUTPUT_DIR, "fragment"), { recursive: true, force: true });
-  console.log("Removed fragments directory");
 
   await pagefind.close();
 }
