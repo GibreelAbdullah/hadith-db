@@ -1,280 +1,38 @@
 #!/usr/bin/env python3
-"""Convert hadith-db SQLite databases into plain text files + JSON metadata."""
+"""Regenerate metadata.json files from the text files (source of truth).
 
-import sqlite3
+This script reads the text files in data/{collection}/{lang}.txt,
+parses the category|num|text format, and regenerates metadata.json
+with byte offsets, book structure, records, and gradings.
+
+Source of truth:
+  - data/{collection}/*.txt  (hadith text per language)
+  - data/collections.json    (collection list, categories, languages)
+  - data/gradeTranslations.json (grade translations)
+
+Generated:
+  - data/{collection}/metadata.json (byte offsets, records, books, gradings)
+"""
+
 import json
 import os
+import urllib.request
 
-DB_DIR = os.path.dirname(os.path.abspath(__file__))
-MASTER_DB = os.path.join(DB_DIR, "master", "master.db")
-BOOKS_DIR = os.path.join(DB_DIR, "books")
-OUTPUT_DIR = os.path.join(DB_DIR, "data")
-
-
-def generate_collections_json():
-    """Generate the top-level collections.json from master.db."""
-    conn = sqlite3.connect(MASTER_DB)
-    cur = conn.cursor()
-
-    languages = [
-        {"short_name": r[0], "full_name": r[1], "rtl": bool(r[2])}
-        for r in cur.execute("SELECT short_name, full_name, rtl FROM languages")
-    ]
-
-    collections = []
-    for r in cur.execute("SELECT short_name, ar, en FROM collection ORDER BY id"):
-        # Get available languages from the book's database
-        book_db = os.path.join(BOOKS_DIR, f"{r[0]}.db")
-        available_langs = ["ar", "en"]
-        if os.path.exists(book_db):
-            bconn = sqlite3.connect(book_db)
-            row = bconn.execute(
-                "SELECT \"langs$start_end_hadith\" FROM hadith_data WHERE category='collection' LIMIT 1"
-            ).fetchone()
-            if row and row[0]:
-                available_langs = json.loads(row[0])
-            bconn.close()
-        collections.append({"short_name": r[0], "ar": r[1], "en": r[2], "languages": available_langs})
-
-    conn.close()
-
-    # Define categories
-    categories = [
-        {
-            "id": "kutub_al_sittah",
-            "name": {"ar": "الكتب الستة", "en": "The Six Canonical Books", "ur": "صحاح ستہ", "tr": "Altı Büyük Hadis Kitabı", "bn": "কুতুবুস সিত্তাহ", "fr": "Les Six Recueils Canoniques", "id": "Enam Kitab Pokok Hadis", "ru": "Шесть канонических сборников"},
-            "collections": ["bukhari", "muslim", "nasai", "abudawud", "tirmidhi", "ibn_majah"]
-        },
-        {
-            "id": "kutub_al_aimmah",
-            "name": {"ar": "كتب الأئمة", "en": "Books of the Imams", "ur": "کتب الائمہ", "tr": "İmamların Kitapları", "bn": "ইমামদের কিতাব", "fr": "Livres des Imams", "id": "Kitab Para Imam", "ru": "Книги имамов"},
-            "collections": ["malik", "musnad_ahmad", "abuhanifa"]
-        },
-        {
-            "id": "al_ahkam_wal_fiqh",
-            "name": {"ar": "الأحكام والفقه", "en": "Jurisprudence & Rulings", "ur": "احکام و فقہ", "tr": "Hükümler ve Fıkıh", "bn": "আহকাম ও ফিকহ", "fr": "Jurisprudence et Règles", "id": "Hukum dan Fikih", "ru": "Законоположения и фикх"},
-            "collections": ["bulugh_almaram", "mishkat"]
-        },
-        {
-            "id": "al_adab_wal_fadhail",
-            "name": {"ar": "الآداب والفضائل", "en": "Manners & Virtues", "ur": "آداب و فضائل", "tr": "Edeb ve Faziletler", "bn": "আদব ও ফযীলত", "fr": "Convenances et Vertus", "id": "Adab dan Keutamaan", "ru": "Нравы и достоинства"},
-            "collections": ["riyad_assalihin", "aladab_almufrad"]
-        },
-        {
-            "id": "ash_shamail",
-            "name": {"ar": "الشمائل", "en": "Prophetic Character", "ur": "شمائل نبوی", "tr": "Peygamber Ahlâkı", "bn": "নবী চরিত্র", "fr": "Les Caractéristiques Prophétiques", "id": "Akhlak Nabi", "ru": "Пророческий нрав"},
-            "collections": ["shamail"]
-        },
-        {
-            "id": "ad_dua_wal_adhkar",
-            "name": {"ar": "الدعاء والأذكار", "en": "Supplications & Remembrance", "ur": "دعا و اذکار", "tr": "Dua ve Zikirler", "bn": "দু'আ ও যিকির", "fr": "Invocations et Rappels", "id": "Doa dan Dzikir", "ru": "Мольбы и поминания"},
-            "collections": ["hisn_almuslim"]
-        },
-        {
-            "id": "al_arbaʿiniyyat",
-            "name": {"ar": "الأربعينيات", "en": "Forty Hadith Collections", "ur": "اربعینیات", "tr": "Kırk Hadis Derlemeleri", "bn": "চল্লিশ হাদিস সংকলন", "fr": "Les Quarante Hadiths", "id": "Kumpulan Empat Puluh Hadits", "ru": "Сборники сорока хадисов"},
-            "collections": ["nawawi", "qudsi", "dehlawi"]
-        },
-        {
-            "id": "majami_ukhra",
-            "name": {"ar": "مجاميع أخرى", "en": "Other Collections", "ur": "دیگر مجموعے", "tr": "Diğer Derlemeler", "bn": "অন্যান্য সংকলন", "fr": "Autres Recueils", "id": "Koleksi Lainnya", "ru": "Другие сборники"},
-            "collections": ["maanialathaar", "fadail_ayaat_suar"]
-        }
-    ]
-
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    with open(os.path.join(OUTPUT_DIR, "collections.json"), "w", encoding="utf-8") as f:
-        json.dump({"languages": languages, "collections": collections, "categories": categories}, f, ensure_ascii=False)
-
-
-def process_book(db_path, collection_short_name, gradings):
-    """Convert a single book database into text files + metadata."""
-    conn = sqlite3.connect(db_path)
-    cur = conn.cursor()
-
-    # Detect language columns dynamically
-    table_info = cur.execute("PRAGMA table_info(hadith_data)").fetchall()
-    all_columns = [col[1] for col in table_info]
-    known_non_lang = {"chronology", "langs$start_end_hadith", "book_number", "chapter_number", "hadith_num", "hadith_num_book", "category"}
-    lang_columns = [c for c in all_columns if c not in known_non_lang]
-
-    lang_cols_sql = ", ".join(f'"{c}"' for c in lang_columns)
-    rows = cur.execute(
-        f'SELECT chronology, "langs$start_end_hadith", book_number, chapter_number, '
-        f"hadith_num, hadith_num_book, {lang_cols_sql}, category "
-        f"FROM hadith_data ORDER BY chronology"
-    ).fetchall()
-    conn.close()
-
-    out_dir = os.path.join(OUTPUT_DIR, collection_short_name)
-    os.makedirs(out_dir, exist_ok=True)
-
-    # Build text files and metadata
-    lines_by_lang = {lang: [] for lang in lang_columns}
-    metadata = {
-        "collection": collection_short_name,
-        "languages": lang_columns,
-        "books": [],
-        "records": [],
-        "offsets": {lang: [] for lang in lang_columns},
-    }
-
-    collection_info = {lang: "" for lang in lang_columns}
-    collection_intro = {lang: "" for lang in lang_columns}
-    current_books = {}
-
-    for row in rows:
-        # Row structure: chronology, langs_field, book_num, chapter_num, hadith_num, hadith_num_book, *lang_texts, category
-        _chron = row[0]
-        langs_field = row[1]
-        book_num = row[2]
-        chapter_num = row[3]
-        hadith_num = row[4]
-        hadith_num_book = row[5]
-        lang_texts = {lang_columns[i]: row[6 + i] for i in range(len(lang_columns))}
-        category = row[6 + len(lang_columns)]
-
-        # Standardize hadith numbers - remove spaces
-        if hadith_num:
-            hadith_num = hadith_num.replace(" ", "")
-
-        for lang in lang_columns:
-            text = (lang_texts[lang] or "").replace("\n", "\\n")
-            # For structural rows, fall back to another language if empty
-            if not text and category in ("collection", "book", "book_intro", "chapter", "chapter_intro"):
-                for fallback in ["en", "ar"] + lang_columns:
-                    fb_text = (lang_texts.get(fallback) or "").replace("\n", "\\n")
-                    if fb_text:
-                        text = fb_text
-                        break
-            lines_by_lang[lang].append(f"{category}|{hadith_num or ''}|{text}")
-
-        line_index = len(lines_by_lang[lang_columns[0]]) - 1
-
-        record = {"line": line_index, "cat": category}
-
-        if category == "collection":
-            for lang in lang_columns:
-                text = (lang_texts[lang] or "").replace("\n", "\\n")
-                if not text:
-                    for fallback in ["en", "ar"] + lang_columns:
-                        fb = (lang_texts.get(fallback) or "").replace("\n", "\\n")
-                        if fb:
-                            text = fb
-                            break
-                collection_info[lang] = text
-            available_langs = json.loads(langs_field) if langs_field else lang_columns
-            metadata["languages"] = available_langs
-        elif category == "collection_intro":
-            for lang in lang_columns:
-                text = (lang_texts[lang] or "").replace("\n", "\\n")
-                if not text:
-                    for fallback in ["en", "ar"] + lang_columns:
-                        fb = (lang_texts.get(fallback) or "").replace("\n", "\\n")
-                        if fb:
-                            text = fb
-                            break
-                collection_intro[lang] = text
-        elif category == "book":
-            hadith_range = json.loads(langs_field) if langs_field else [0, 0]
-            record["book"] = book_num
-            book_entry = {
-                "number": book_num,
-                "hadith_start": hadith_range[0],
-                "hadith_end": hadith_range[1],
-            }
-            for lang in lang_columns:
-                text = (lang_texts[lang] or "").replace("\n", "\\n")
-                if not text:
-                    for fallback in ["en", "ar"] + lang_columns:
-                        fb = (lang_texts.get(fallback) or "").replace("\n", "\\n")
-                        if fb:
-                            text = fb
-                            break
-                book_entry[lang] = text
-            current_books[book_num] = book_entry
-        elif category == "book_intro":
-            record["book"] = book_num
-        elif category == "chapter":
-            record["book"] = book_num
-            record["chapter"] = chapter_num
-        elif category == "chapter_intro":
-            record["book"] = book_num
-            record["chapter"] = chapter_num
-        elif category == "hadith":
-            record["book"] = book_num
-            record["chapter"] = chapter_num
-            record["num"] = hadith_num
-            record["num_book"] = hadith_num_book
-
-        metadata["records"].append(record)
-
-    # Add gradings for this collection
-    coll_gradings = gradings.get(collection_short_name, {})
-    if coll_gradings:
-        # Store as {hadith_num: [[name, grade], ...]}
-        metadata_gradings = {}
-        for rec in metadata["records"]:
-            if rec.get("cat") == "hadith" and rec.get("num"):
-                # Handle composite numbers like "272,273" - check each
-                for num_part in rec["num"].split(","):
-                    if num_part in coll_gradings:
-                        metadata_gradings[rec["num"]] = [
-                            [g["name"], g["grade"]] for g in coll_gradings[num_part]
-                        ]
-                        break
-        metadata["gradings"] = metadata_gradings
-
-    # Write text files and compute byte offsets
-    for lang in lang_columns:
-        content = "\n".join(lines_by_lang[lang]) + "\n"
-        content_bytes = content.encode("utf-8")
-        with open(os.path.join(out_dir, f"{lang}.txt"), "wb") as f:
-            f.write(content_bytes)
-
-        # Compute byte offsets for each line
-        offsets = []
-        offset = 0
-        for line in lines_by_lang[lang]:
-            offsets.append(offset)
-            offset += len(line.encode("utf-8")) + 1
-        offsets.append(offset)  # end sentinel
-        metadata["offsets"][lang] = offsets
-
-    metadata["collection_info"] = collection_info
-    metadata["collection_intro"] = collection_intro
-    metadata["books"] = [current_books[k] for k in sorted(current_books.keys(), key=lambda x: (int(''.join(c for c in x if c.isdigit()) or '0'), x))]
-
-    # Supplement book names from sections file if available
-    sections_path = os.path.join(DB_DIR, "sections", f"{collection_short_name}.min.json")
-    if os.path.exists(sections_path):
-        sections_data = json.load(open(sections_path, encoding="utf-8"))
-        section_books = sections_data.get("books", {})
-        for book in metadata["books"]:
-            sec = section_books.get(str(book["number"]), {})
-            if not book.get("ar") or book["ar"] == "":
-                book["ar"] = sec.get("ara-name", "")
-            if not book.get("en") or book["en"] == "":
-                book["en"] = sec.get("eng-name", "")
-
-    with open(os.path.join(out_dir, "metadata.json"), "w", encoding="utf-8") as f:
-        json.dump(metadata, f, ensure_ascii=False)
-
-    sizes = ", ".join(f"{lang}={len(('\n'.join(lines_by_lang[lang]) + '\n').encode('utf-8'))} bytes" for lang in lang_columns)
-    print(f"  {collection_short_name}: {len(lines_by_lang[lang_columns[0]])} records, {sizes}")
-
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(SCRIPT_DIR, "data")
 
 GRADINGS_URL = "https://raw.githubusercontent.com/GibreelAbdullah/hadith-api/refs/heads/1/info.json"
-GRADINGS_CACHE = os.path.join(DB_DIR, ".gradings_cache.json")
+GRADINGS_CACHE = os.path.join(SCRIPT_DIR, ".gradings_cache.json")
 
 # Map info.json collection names to our collection names
-COLLECTION_NAME_MAP = {
+GRADING_NAME_MAP = {
     "abudawud": "abudawud",
     "ibnmajah": "ibn_majah",
     "malik": "malik",
     "nasai": "nasai",
     "tirmidhi": "tirmidhi",
 }
+
 
 def arabicnumber_to_hadith_num(num):
     """Convert info.json arabicnumber (e.g., 384.2) to our format (e.g., 384b)."""
@@ -283,26 +41,23 @@ def arabicnumber_to_hadith_num(num):
     s = str(num)
     if "." in s:
         base, suffix = s.split(".", 1)
-        # .2 -> b, .3 -> c, etc.
         suffix_int = int(suffix)
         if suffix_int >= 2:
             return base + chr(ord("a") + suffix_int - 1)
+        elif suffix_int == 1:
+            return base
     return s
 
 
 def load_gradings():
-    """Load gradings from hadith-api info.json, using a local cache."""
-    import urllib.request
-
+    """Load gradings from hadith-api info.json."""
     if not os.path.exists(GRADINGS_CACHE):
         print(f"  Downloading gradings from {GRADINGS_URL}...")
         urllib.request.urlretrieve(GRADINGS_URL, GRADINGS_CACHE)
 
     data = json.load(open(GRADINGS_CACHE, encoding="utf-8"))
-
-    # Build a lookup: {our_collection_name: {hadith_num_str: [grades]}}
     gradings = {}
-    for info_name, our_name in COLLECTION_NAME_MAP.items():
+    for info_name, our_name in GRADING_NAME_MAP.items():
         if info_name not in data:
             continue
         coll_gradings = {}
@@ -313,33 +68,214 @@ def load_gradings():
             if arabic_num is None:
                 continue
             hadith_num = arabicnumber_to_hadith_num(arabic_num)
-            coll_gradings[hadith_num] = h["grades"]
+            coll_gradings[hadith_num] = [[g["name"], g["grade"]] for g in h["grades"]]
         gradings[our_name] = coll_gradings
         print(f"  Loaded {len(coll_gradings)} gradings for {our_name}")
-
     return gradings
 
 
-def main():
-    print("Generating collections.json...")
-    generate_collections_json()
+def process_collection(coll_dir, collection_short_name, gradings, collections_data):
+    """Regenerate metadata.json from the text files."""
+    # Find available languages (txt files in the directory)
+    lang_files = {}
+    for f in os.listdir(coll_dir):
+        if f.endswith(".txt"):
+            lang = f[:-4]
+            lang_files[lang] = os.path.join(coll_dir, f)
 
-    print("Loading gradings from hadith-api info.json...")
+    if not lang_files:
+        return
+
+    # Use the first available language to parse structure
+    primary_lang = "ar" if "ar" in lang_files else list(lang_files.keys())[0]
+    primary_lines = open(lang_files[primary_lang], "rb").read().decode("utf-8").split("\n")
+    # Remove trailing empty line
+    if primary_lines and primary_lines[-1] == "":
+        primary_lines = primary_lines[:-1]
+
+    # Parse structure from the primary language file
+    records = []
+    books = {}
+    collection_info = {}
+    collection_intro = {}
+
+    for line_idx, line in enumerate(primary_lines):
+        first_pipe = line.find("|")
+        if first_pipe == -1:
+            continue
+        second_pipe = line.find("|", first_pipe + 1)
+        if second_pipe == -1:
+            continue
+
+        category = line[:first_pipe]
+        num = line[first_pipe + 1:second_pipe]
+
+        record = {"line": line_idx, "cat": category}
+
+        if category == "collection":
+            pass
+        elif category == "collection_intro":
+            pass
+        elif category == "book":
+            record["book"] = num if num else str(len(books) + 1)
+        elif category == "book_intro":
+            # Find which book this belongs to
+            for prev_idx in range(line_idx - 1, -1, -1):
+                prev_rec = records[prev_idx] if prev_idx < len(records) else None
+                if prev_rec and prev_rec.get("cat") == "book":
+                    record["book"] = prev_rec["book"]
+                    break
+        elif category == "chapter":
+            # Find the current book
+            for prev_rec in reversed(records):
+                if prev_rec.get("cat") == "book":
+                    record["book"] = prev_rec["book"]
+                    break
+            record["chapter"] = num
+        elif category == "chapter_intro":
+            for prev_rec in reversed(records):
+                if prev_rec.get("cat") == "chapter":
+                    record["book"] = prev_rec.get("book")
+                    record["chapter"] = prev_rec.get("chapter")
+                    break
+        elif category == "hadith":
+            for prev_rec in reversed(records):
+                if prev_rec.get("cat") in ("book", "chapter"):
+                    record["book"] = prev_rec.get("book")
+                    if prev_rec.get("cat") == "chapter":
+                        record["chapter"] = prev_rec.get("chapter")
+                    break
+            record["num"] = num
+            # num_book: count hadiths in this book
+            book_num = record.get("book")
+            if book_num not in books:
+                books[book_num] = {"count": 0}
+            books[book_num]["count"] += 1
+            record["num_book"] = books[book_num]["count"]
+
+        records.append(record)
+
+    # Build collection_info and books metadata from all language files
+    # Use language order from collections.json, falling back to sorted
+    coll_entry = next((c for c in collections_data["collections"] if c["short_name"] == collection_short_name), None)
+    if coll_entry and coll_entry.get("languages"):
+        lang_columns = [l for l in coll_entry["languages"] if l in lang_files]
+    else:
+        lang_columns = sorted(lang_files.keys())
+
+    for lang in lang_columns:
+        lines = open(lang_files[lang], "rb").read().decode("utf-8").split("\n")
+        if lines and lines[-1] == "":
+            lines = lines[:-1]
+
+        for rec in records:
+            if rec["line"] >= len(lines):
+                continue
+            line = lines[rec["line"]]
+            second_pipe = line.find("|", line.find("|") + 1)
+            text = line[second_pipe + 1:] if second_pipe != -1 else ""
+
+            if rec["cat"] == "collection":
+                collection_info[lang] = text
+            elif rec["cat"] == "collection_intro":
+                collection_intro[lang] = text
+
+    # Build books list with names and hadith ranges
+    books_list = []
+    book_numbers = []
+    for rec in records:
+        if rec["cat"] == "book":
+            book_numbers.append(rec.get("book", ""))
+
+    for book_num in book_numbers:
+        book_entry = {"number": book_num, "hadith_start": 0, "hadith_end": 0}
+
+        # Get hadith range
+        book_hadiths = [r for r in records if r.get("cat") == "hadith" and r.get("book") == book_num]
+        if book_hadiths:
+            nums = []
+            for h in book_hadiths:
+                try:
+                    nums.append(int("".join(c for c in h["num"] if c.isdigit()) or "0"))
+                except:
+                    pass
+            if nums:
+                book_entry["hadith_start"] = min(nums)
+                book_entry["hadith_end"] = max(nums)
+
+        # Get book names from each language
+        book_rec = next((r for r in records if r["cat"] == "book" and r.get("book") == book_num), None)
+        if book_rec:
+            for lang in lang_columns:
+                lines = open(lang_files[lang], "rb").read().decode("utf-8").split("\n")
+                if book_rec["line"] < len(lines):
+                    line = lines[book_rec["line"]]
+                    second_pipe = line.find("|", line.find("|") + 1)
+                    text = line[second_pipe + 1:] if second_pipe != -1 else ""
+                    book_entry[lang] = text
+
+        books_list.append(book_entry)
+
+    # Compute byte offsets for each language
+    offsets = {}
+    for lang in lang_columns:
+        content = open(lang_files[lang], "rb").read()
+        lang_offsets = []
+        offset = 0
+        for line in content.split(b"\n"):
+            lang_offsets.append(offset)
+            offset += len(line) + 1  # +1 for \n
+        # Remove the last offset if file ends with \n (extra empty entry)
+        if content.endswith(b"\n"):
+            lang_offsets.append(offset - 1)
+        else:
+            lang_offsets.append(offset)
+        offsets[lang] = lang_offsets
+
+    # Add gradings
+    coll_gradings = gradings.get(collection_short_name, {})
+    metadata_gradings = {}
+    if coll_gradings:
+        for rec in records:
+            if rec.get("cat") == "hadith" and rec.get("num"):
+                for num_part in rec["num"].split(","):
+                    if num_part in coll_gradings:
+                        metadata_gradings[rec["num"]] = coll_gradings[num_part]
+                        break
+
+    # Build final metadata
+    metadata = {
+        "collection": collection_short_name,
+        "languages": lang_columns,
+        "books": books_list,
+        "records": records,
+        "offsets": offsets,
+        "collection_info": collection_info,
+        "collection_intro": collection_intro,
+    }
+    if metadata_gradings:
+        metadata["gradings"] = metadata_gradings
+
+    with open(os.path.join(coll_dir, "metadata.json"), "w", encoding="utf-8") as f:
+        json.dump(metadata, f, ensure_ascii=False)
+
+    print(f"  {collection_short_name}: {len(records)} records, {len(lang_columns)} languages")
+
+
+def main():
+    collections_path = os.path.join(DATA_DIR, "collections.json")
+    collections_data = json.load(open(collections_path, encoding="utf-8"))
+
+    print("Loading gradings...")
     gradings = load_gradings()
 
-    print("Processing books...")
-    conn = sqlite3.connect(MASTER_DB)
-    collections = [r[0] for r in conn.execute("SELECT short_name FROM collection ORDER BY id")]
-    conn.close()
+    print("\nRegenerating metadata from text files...")
+    for coll in collections_data["collections"]:
+        coll_dir = os.path.join(DATA_DIR, coll["short_name"])
+        if os.path.isdir(coll_dir):
+            process_collection(coll_dir, coll["short_name"], gradings, collections_data)
 
-    for coll in collections:
-        db_path = os.path.join(BOOKS_DIR, f"{coll}.db")
-        if os.path.exists(db_path):
-            process_book(db_path, coll, gradings)
-        else:
-            print(f"  WARNING: {db_path} not found, skipping")
-
-    print("Done!")
+    print("\nDone!")
 
 
 if __name__ == "__main__":
