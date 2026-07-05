@@ -195,10 +195,12 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         if book_hadiths:
             nums = []
             for h in book_hadiths:
-                try:
-                    nums.append(int("".join(c for c in h["num"] if c.isdigit()) or "0"))
-                except:
-                    pass
+                # Handle composite numbers like "272,273"
+                for part in h["num"].split(","):
+                    try:
+                        nums.append(int("".join(c for c in part if c.isdigit()) or "0"))
+                    except:
+                        pass
             if nums:
                 book_entry["hadith_start"] = min(nums)
                 book_entry["hadith_end"] = max(nums)
