@@ -195,8 +195,10 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         if book_hadiths:
             nums = []
             for h in book_hadiths:
-                # Handle composite numbers like "272,273"
-                for part in h["num"].split(","):
+                # Handle composite numbers like "272,273" or "5773-5775"
+                import re
+                for part in re.split(r'[,\-]', h["num"]):
+                    part = part.strip()
                     try:
                         nums.append(int("".join(c for c in part if c.isdigit()) or "0"))
                     except:
