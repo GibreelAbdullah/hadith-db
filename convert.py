@@ -272,12 +272,46 @@ def main():
     print("Loading gradings...")
     gradings = load_gradings()
 
+    # Load previous hashes for change detection
+    hash_file = os.path.join(DATA_DIR, ".convert_hashes.json")
+    prev_hashes = {}
+    try:
+        prev_hashes = json.load(open(hash_file, encoding="utf-8"))
+    except:
+        pass
+
+    import hashlib
+    new_hashes = {}
+
     print("\nRegenerating metadata from text files...")
+    skipped = 0
     for coll in collections_data["collections"]:
         coll_dir = os.path.join(DATA_DIR, coll["short_name"])
-        if os.path.isdir(coll_dir):
-            process_collection(coll_dir, coll["short_name"], gradings, collections_data)
+        if not os.path.isdir(coll_dir):
+            continue
 
+        # Compute hash of all txt files in this collection
+        h = hashlib.md5()
+        for f in sorted(os.listdir(coll_dir)):
+            if f.endswith(".txt"):
+                h.update(open(os.path.join(coll_dir, f), "rb").read())
+        current_hash = h.hexdigest()
+        new_hashes[coll["short_name"]] = current_hash
+
+        # Skip if unchanged and metadata exists
+        meta_path = os.path.join(coll_dir, "metadata.json")
+        if current_hash == prev_hashes.get(coll["short_name"]) and os.path.exists(meta_path):
+            skipped += 1
+            continue
+
+        process_collection(coll_dir, coll["short_name"], gradings, collections_data)
+
+    # Save hashes
+    with open(hash_file, "w", encoding="utf-8") as f:
+        json.dump(new_hashes, f)
+
+    if skipped:
+        print(f"\n  ({skipped} collections unchanged, skipped)")
     print("\nDone!")
 
 

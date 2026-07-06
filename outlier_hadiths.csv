@@ -1,0 +1,224 @@
+collection,collection_name,book_number,book_name,line,hadith_num,extracted_value,expected_range
+muslim,Sahih Muslim,4,The Book of Prayers,1047,274l,274,410-480
+muslim,Sahih Muslim,4,The Book of Prayers,1048,274m,274,410-480
+muslim,Sahih Muslim,5,The Book of Mosques and Places of Prayer,1409,389f,389,564-648
+muslim,Sahih Muslim,5,The Book of Mosques and Places of Prayer,1410,389g,389,564-648
+muslim,Sahih Muslim,5,The Book of Mosques and Places of Prayer,1411,389h,389,564-648
+muslim,Sahih Muslim,5,The Book of Mosques and Places of Prayer,1412,389i,389,564-648
+muslim,Sahih Muslim,5,The Book of Mosques and Places of Prayer,1663,33c,33,564-648
+muslim,Sahih Muslim,5,The Book of Mosques and Places of Prayer,1664,33d,33,564-648
+muslim,Sahih Muslim,5,The Book of Mosques and Places of Prayer,1665,33e,33,564-648
+muslim,Sahih Muslim,6,The Book of Prayer - Travellers,1855,336d,336,717-795
+muslim,Sahih Muslim,6,The Book of Prayer - Travellers,1856,336e,336,717-795
+muslim,Sahih Muslim,6,The Book of Prayer - Travellers,1857,336f,336,717-795
+muslim,Sahih Muslim,6,The Book of Prayer - Travellers,1858,336g,336,717-795
+muslim,Sahih Muslim,12,The Book of Zakat,2613,94c,94,998-1059
+muslim,Sahih Muslim,12,The Book of Zakat,2614,94d,94,998-1059
+muslim,Sahih Muslim,12,The Book of Zakat,2657,157c,157,998-1059
+muslim,Sahih Muslim,12,The Book of Zakat,2658,157d,157,998-1059
+muslim,Sahih Muslim,12,The Book of Zakat,2778,150e,150,998-1059
+muslim,Sahih Muslim,12,The Book of Zakat,2779,150f,150,998-1059
+muslim,Sahih Muslim,12,The Book of Zakat,2780,150g,150,998-1059
+muslim,Sahih Muslim,13,The Book of Fasting,3051,827b,827,1101-1151
+muslim,Sahih Muslim,13,The Book of Fasting,3052,827c,827,1101-1151
+muslim,Sahih Muslim,13,The Book of Fasting,3113,782c,782,1101-1151
+muslim,Sahih Muslim,13,The Book of Fasting,3173,762d,762,1101-1151
+muslim,Sahih Muslim,13,The Book of Fasting,3174,762e,762,1101-1151
+muslim,Sahih Muslim,15,The Book of Pilgrimage,3553,703e,703,1211-1332
+muslim,Sahih Muslim,15,The Book of Pilgrimage,3731,827d,827,1211-1332
+muslim,Sahih Muslim,15,The Book of Pilgrimage,3732,827e,827,1211-1332
+muslim,Sahih Muslim,15,The Book of Pilgrimage,3733,827f,827,1211-1332
+muslim,Sahih Muslim,15,The Book of Pilgrimage,3734,827g,827,1211-1332
+muslim,Sahih Muslim,15,The Book of Pilgrimage,3735,827h,827,1211-1332
+muslim,Sahih Muslim,16,The Book of Marriage,4004,1365c,1365,1407-1432
+muslim,Sahih Muslim,16,The Book of Marriage,4005,1365d,1365,1407-1432
+muslim,Sahih Muslim,16,The Book of Marriage,4006,154b,154,1407-1432
+muslim,Sahih Muslim,16,The Book of Marriage,4007,1365e,1365,1407-1432
+muslim,Sahih Muslim,16,The Book of Marriage,4009,1365f,1365,1407-1432
+muslim,Sahih Muslim,17,The Book of Suckling,4170,715d,715,1445-1460
+muslim,Sahih Muslim,17,The Book of Suckling,4172,715e,715,1445-1460
+muslim,Sahih Muslim,17,The Book of Suckling,4173,715f,715,1445-1460
+muslim,Sahih Muslim,17,The Book of Suckling,4174,715g,715,1445-1460
+muslim,Sahih Muslim,17,The Book of Suckling,4175,715h,715,1445-1460
+muslim,Sahih Muslim,17,The Book of Suckling,4176,715i,715,1445-1460
+muslim,Sahih Muslim,17,The Book of Suckling,4177,715j,715,1445-1460
+muslim,Sahih Muslim,17,The Book of Suckling,4179,715k,715,1445-1460
+muslim,Sahih Muslim,17,The Book of Suckling,4181,715l,715,1445-1460
+muslim,Sahih Muslim,18,The Book of Divorce,4284,938c,938,1471-1481
+muslim,Sahih Muslim,18,The Book of Divorce,4285,938d,938,1471-1481
+muslim,Sahih Muslim,18,The Book of Divorce,4286,938e,938,1471-1481
+muslim,Sahih Muslim,20,The Book of Emancipating Slaves,4345,1370d,1370,1504-1508
+muslim,Sahih Muslim,21,The Book of Transactions,4369,1412e,1412,1526-1542
+muslim,Sahih Muslim,21,The Book of Transactions,4370,1412f,1412,1526-1542
+muslim,Sahih Muslim,22,The Book of Musaqah,4627,1202b,1202,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4628,1202c,1202,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4694,715m,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4695,715n,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4696,715o,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4697,715p,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4698,715q,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4699,715r,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4700,715s,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4701,715t,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4702,715u,715,1560-1594
+muslim,Sahih Muslim,22,The Book of Musaqah,4703,715v,715,1560-1594
+muslim,Sahih Muslim,25,The Book of Wills,4841,1004c,1004,1627-1634
+muslim,Sahih Muslim,25,The Book of Wills,4842,1004d,1004,1627-1634
+muslim,Sahih Muslim,25,The Book of Wills,4843,1004e,1004,1627-1634
+muslim,Sahih Muslim,27,The Book of Oaths,4967,1501c,1501,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4968,1501d,1501,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4969,1501e,1501,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4970,1501f,1501,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4971,1501g,1501,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4972,1501h,1501,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4973,1502b,1502,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4974,1503d,1503,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4975,1503e,1503,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4976,1503f,1503,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4981,997c,997,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4982,997d,997,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4983,997e,997,1648-1659
+muslim,Sahih Muslim,27,The Book of Oaths,4984,997f,997,1648-1659
+muslim,Sahih Muslim,30,The Book of Judicial Decisions,5156,593f,593,1713-1717
+muslim,Sahih Muslim,30,The Book of Judicial Decisions,5157,593g,593,1713-1717
+muslim,Sahih Muslim,30,The Book of Judicial Decisions,5158,593h,593,1713-1717
+muslim,Sahih Muslim,30,The Book of Judicial Decisions,5159,593i,593,1713-1717
+muslim,Sahih Muslim,31,The Book of Lost Property,5196,48b,48,1722-1726
+muslim,Sahih Muslim,31,The Book of Lost Property,5197,48c,48,1722-1726
+muslim,Sahih Muslim,31,The Book of Lost Property,5198,48d,48,1722-1726
+muslim,Sahih Muslim,32,The Book of Jihad and Expeditions,5394,1365g,1365,1749-1794
+muslim,Sahih Muslim,32,The Book of Jihad and Expeditions,5395,1365h,1365,1749-1794
+muslim,Sahih Muslim,32,The Book of Jihad and Expeditions,5396,1365i,1365,1749-1794
+muslim,Sahih Muslim,32,The Book of Jihad and Expeditions,5427,1254b,1254,1749-1794
+muslim,Sahih Muslim,32,The Book of Jihad and Expeditions,5428,1254c,1254,1749-1794
+muslim,Sahih Muslim,33,The Book on Government,5456,1652c,1652,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5457,1652d,1652,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5458,1733c,1733,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5459,1733d,1733,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5471,142e,142,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5472,142f,142,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5473,142g,142,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5474,142h,142,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5512,1709e,1709,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5513,1709f,1709,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5514,1709g,1709,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5515,1709h,1709,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5583,1353c,1353,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5584,1353d,1353,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5691,677k,677,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5741,1037c,1037,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5742,1037d,1037,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5753,715w,715,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5754,715x,715,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5755,715y,715,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5756,715z,715,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5757,715aa,715,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5758,715ab,715,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5759,715ac,715,1835-1890
+muslim,Sahih Muslim,33,The Book on Government,5760,715ad,715,1835-1890
+muslim,Sahih Muslim,34,"The Book of Hunting, Slaughter, and what may be Eaten",5800,1407f,1407,1932-1949
+muslim,Sahih Muslim,34,"The Book of Hunting, Slaughter, and what may be Eaten",5801,1407g,1407,1932-1949
+muslim,Sahih Muslim,34,"The Book of Hunting, Slaughter, and what may be Eaten",5803,561c,561,1932-1949
+muslim,Sahih Muslim,34,"The Book of Hunting, Slaughter, and what may be Eaten",5804,561d,561,1932-1949
+muslim,Sahih Muslim,34,"The Book of Hunting, Slaughter, and what may be Eaten",5813,1802c,1802,1932-1949
+muslim,Sahih Muslim,34,"The Book of Hunting, Slaughter, and what may be Eaten",5814,1802d,1802,1932-1949
+muslim,Sahih Muslim,36,The Book of Drinks,5995,17d,17,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,5996,17e,17,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,5997,17f,17,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,5998,17g,17,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6024,977c,977,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6025,977d,977,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6026,977g,977,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6032,1733e,1733,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6033,1733f,1733,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6034,1733g,1733,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6061,168b,168,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6062,168c,168,1996-2040
+muslim,Sahih Muslim,36,The Book of Drinks,6112,267d,267,1996-2040
+muslim,Sahih Muslim,39,The Book of Greetings,6659,1202d,1202,2182-2225
+muslim,Sahih Muslim,39,The Book of Greetings,6660,1577d,1577,2182-2225
+muslim,Sahih Muslim,39,The Book of Greetings,6674,"287d,2214a",287,2182-2225
+muslim,Sahih Muslim,39,The Book of Greetings,6675,"2214b,287e",287,2182-2225
+muslim,Sahih Muslim,39,The Book of Greetings,6730,537c,537,2182-2225
+muslim,Sahih Muslim,39,The Book of Greetings,6731,537d,537,2182-2225
+muslim,Sahih Muslim,39,The Book of Greetings,6732,537e,537,2182-2225
+muslim,Sahih Muslim,43,The Book of Virtues,6887,706c,706,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,6888,1392b,1392,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,6889,1392c,1392,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,6891,843c,843,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,6892,843d,843,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,6893,843e,843,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,7082,1337b,1337,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,7083,1337c,1337,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,7084,1337d,1337,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,7115,151c,151,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,7116,151d,151,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,7117,151e,151,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,7120,339b,339,2299-2353
+muslim,Sahih Muslim,43,The Book of Virtues,7121,339c,339,2299-2353
+muslim,Sahih Muslim,44,The Book of the Merits of the Companions,7161,1028b,1028,2417-2508
+muslim,Sahih Muslim,44,The Book of the Merits of the Companions,7220,1748c,1748,2417-2508
+muslim,Sahih Muslim,44,The Book of the Merits of the Companions,7221,1748d,1748,2417-2508
+muslim,Sahih Muslim,44,The Book of the Merits of the Companions,7319,2144d,2144,2417-2508
+muslim,Sahih Muslim,44,The Book of the Merits of the Companions,7320,2144e,2144,2417-2508
+muslim,Sahih Muslim,44,The Book of the Merits of the Companions,7342,799d,799,2417-2508
+muslim,Sahih Muslim,44,The Book of the Merits of the Companions,7343,799e,799,2417-2508
+muslim,Sahih Muslim,44,The Book of the Merits of the Companions,7344,799f,799,2417-2508
+muslim,Sahih Muslim,45,"The Book of Virtue, Enjoining Good Manners, and Joining of the Ties of Kinship",7738,1914b,1914,2565-2613
+muslim,Sahih Muslim,45,"The Book of Virtue, Enjoining Good Manners, and Joining of the Ties of Kinship",7739,1914c,1914,2565-2613
+muslim,Sahih Muslim,45,"The Book of Virtue, Enjoining Good Manners, and Joining of the Ties of Kinship",7740,1914d,1914,2565-2613
+muslim,Sahih Muslim,45,"The Book of Virtue, Enjoining Good Manners, and Joining of the Ties of Kinship",7741,1914e,1914,2565-2613
+muslim,Sahih Muslim,45,"The Book of Virtue, Enjoining Good Manners, and Joining of the Ties of Kinship",7745,2242d,2242,2565-2613
+muslim,Sahih Muslim,45,"The Book of Virtue, Enjoining Good Manners, and Joining of the Ties of Kinship",7746,2242e,2242,2565-2613
+muslim,Sahih Muslim,45,"The Book of Virtue, Enjoining Good Manners, and Joining of the Ties of Kinship",7747,2242f,2242,2565-2613
+muslim,Sahih Muslim,45,"The Book of Virtue, Enjoining Good Manners, and Joining of the Ties of Kinship",7748,2242g,2242,2565-2613
+muslim,Sahih Muslim,46,The Book of Destiny,7825,112b,112,2648-2659
+muslim,Sahih Muslim,48,"The Book Pertaining to the Remembrance of Allah, Supplication, Repentance and Seeking Forgiveness",7982,589b,589,2688-2720
+muslim,Sahih Muslim,48,"The Book Pertaining to the Remembrance of Allah, Supplication, Repentance and Seeking Forgiveness",7983,589c,589,2688-2720
+muslim,Sahih Muslim,50,The Book of Repentance,8076,2675h,2675,2751-2763
+muslim,Sahih Muslim,50,The Book of Repentance,8077,2675i,2675,2751-2763
+muslim,Sahih Muslim,50,The Book of Repentance,8078,2675j,2675,2751-2763
+muslim,Sahih Muslim,50,The Book of Repentance,8107,"2756b,2619b",2619,2751-2763
+muslim,Sahih Muslim,53,"The Book of Paradise, its Description, its Bounties and its Inhabitants",8357,2128b,2128,2835-2865
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8430,157i,157,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8431,157j,157,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8445,144d,144,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8446,144e,144,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8447,144f,144,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8489,157k,157,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8490,157L,157,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8528,157m,157,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8529,157n,157,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8541,"2930a,2931,169d",169,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8547,169e,169,2894-2935
+muslim,Sahih Muslim,54,The Book of Tribulations and Portents of the Last Hour,8548,169f,169,2894-2935
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8635,1055b,1055,2965-2991
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8636,1055c,1055,2965-2991
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8637,1055d,1055,2965-2991
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8667,533c,533,2965-2991
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8668,533d,533,2965-2991
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8669,533e,533,2965-2991
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8718,2493b,2493,2965-2991
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8725,2009c,2009,2965-2991
+muslim,Sahih Muslim,55,The Book of Zuhd and Softening of Hearts,8726,2009d,2009,2965-2991
+tirmidhi,Jami` at-Tirmidhi,32,Chapters On Al-Qadar,3713,"2146,2298",2298,2139-2152
+tirmidhi,Jami` at-Tirmidhi,38,Chapters on the description of Paradise,4340,2735,2735,2536-2561
+tirmidhi,Jami` at-Tirmidhi,39,The Book on the Description of Hellfire,4427,"2591,2795",2795,2581-2598
+tirmidhi,Jami` at-Tirmidhi,43,Chapters on Manners,4854,3093,3093,2765-2828
+tirmidhi,Jami` at-Tirmidhi,47,Chapters on Tafsir,5378,3723,3723,3054-3266
+malik,Muwatta Malik,42,Drinks,1615,1,1,1540-1550
+malik,Muwatta Malik,42,Drinks,1620,2,2,1540-1550
+malik,Muwatta Malik,42,Drinks,1623,3,3,1540-1550
+malik,Muwatta Malik,42,Drinks,1626,4,4,1540-1550
+malik,Muwatta Malik,42,Drinks,1630,5,5,1540-1550
+malik,Muwatta Malik,44,The Oath of Qasama,1682,1599,1599,1600-1600
+malik,Muwatta Malik,49,The Description of the Prophet (ﷺ),1810,13,13,1683-1703
+maanialathaar,Sharh Maani Al-Athar,1,,367,364.1,3641,202-604
+maanialathaar,Sharh Maani Al-Athar,1,,390,386.1,3861,202-604
+maanialathaar,Sharh Maani Al-Athar,1,,391,386.2,3862,202-604
+maanialathaar,Sharh Maani Al-Athar,1,,443,439.1,4391,202-604
+maanialathaar,Sharh Maani Al-Athar,6,,3779,3803.1,38031,3678-4044
+maanialathaar,Sharh Maani Al-Athar,6,,3814,3836.1,38361,3678-4044
+maanialathaar,Sharh Maani Al-Athar,6,,3815,3837.1,38371,3678-4044
+maanialathaar,Sharh Maani Al-Athar,6,,3999,4020.1,40201,3678-4044
+maanialathaar,Sharh Maani Al-Athar,25,,7334,7348.1,73481,7291-7348
