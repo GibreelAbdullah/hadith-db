@@ -195,14 +195,13 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         if book_hadiths:
             nums = []
             for h in book_hadiths:
-                # Handle composite numbers like "272,273" or "5773-5775"
+                # Handle composite numbers like "272,273" or "5773-5775" or "884b,c"
                 import re
                 for part in re.split(r'[,\-]', h["num"]):
                     part = part.strip()
-                    try:
-                        nums.append(int("".join(c for c in part if c.isdigit()) or "0"))
-                    except:
-                        pass
+                    digits = "".join(c for c in part if c.isdigit())
+                    if digits:
+                        nums.append(int(digits))
             if nums:
                 book_entry["hadith_start"] = min(nums)
                 book_entry["hadith_end"] = max(nums)
