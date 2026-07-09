@@ -26,15 +26,12 @@ jobs:
       - name: Install pagefind
         run: npm install pagefind
 
-      - name: Clone Hadith-Hub for search index builder
-        run: git clone --depth 1 https://github.com/GibreelAbdullah/Hadith-Hub.git /tmp/Hadith-Hub
-
       - name: Build search index
         env:
           PAGEFIND_DATA_DIR: ${{ github.workspace }}/data
           PAGEFIND_OUTPUT_DIR: ${{ github.workspace }}/pagefind
           BASE_PATH: '/Hadith-Hub'
-        run: node /tmp/Hadith-Hub/build_search_index.mjs
+        run: node build_search_index.mjs
 
       - name: Prepare deploy directory
         run: |
