@@ -1,0 +1,19 @@
+name: Trigger Hadith-Hub rebuild
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'data/**'
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Hadith-Hub deploy
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.HADITH_HUB_TRIGGER_TOKEN }}" \
+            https://api.github.com/repos/GibreelAbdullah/Hadith-Hub/dispatches \
+            -d '{"event_type":"hadith-db-updated"}'
