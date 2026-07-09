@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install pagefind
+        run: npm install pagefind
+
+      - name: Clone Hadith-Hub for search index builder
+        run: git clone --depth 1 https://github.com/GibreelAbdullah/Hadith-Hub.git /tmp/Hadith-Hub
+
+      - name: Build search index
+        env:
+          PAGEFIND_DATA_DIR: ${{ github.workspace }}/data
+          PAGEFIND_OUTPUT_DIR: ${{ github.workspace }}/pagefind
+          BASE_PATH: '/Hadith-Hub'
+        run: node /tmp/Hadith-Hub/build_search_index.mjs
+
+      - name: Prepare deploy directory
+        run: |
+          mkdir -p _site
+          cp -r data _site/data
+          cp -r pagefind _site/pagefind
+          # version.json uses the commit SHA for cache busting
+          echo "{\"version\":\"${GITHUB_SHA:0:12}\"}" > _site/version.json
+          touch _site/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
