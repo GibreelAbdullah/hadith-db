@@ -256,11 +256,14 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         "collection_info": collection_info,
         "collection_intro": collection_intro,
     }
-    if metadata_gradings:
-        metadata["gradings"] = metadata_gradings
 
     with open(os.path.join(coll_dir, "metadata.json"), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False)
+
+    # Write gradings to a separate file
+    if metadata_gradings:
+        with open(os.path.join(coll_dir, "gradings.json"), "w", encoding="utf-8") as f:
+            json.dump(metadata_gradings, f, ensure_ascii=False)
 
     print(f"  {collection_short_name}: {len(records)} records, {len(lang_columns)} languages")
 
