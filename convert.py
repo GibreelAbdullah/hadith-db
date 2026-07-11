@@ -260,10 +260,9 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
     with open(os.path.join(coll_dir, "metadata.json"), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False)
 
-    # Write gradings to a separate file
-    if metadata_gradings:
-        with open(os.path.join(coll_dir, "gradings.json"), "w", encoding="utf-8") as f:
-            json.dump(metadata_gradings, f, ensure_ascii=False)
+    # Write gradings to a separate file (empty object if no gradings)
+    with open(os.path.join(coll_dir, "gradings.json"), "w", encoding="utf-8") as f:
+        json.dump(metadata_gradings, f, ensure_ascii=False)
 
     print(f"  {collection_short_name}: {len(records)} records, {len(lang_columns)} languages")
 
@@ -289,7 +288,7 @@ def main():
     print("\nRegenerating metadata from text files...")
     skipped = 0
     for coll in collections_data["collections"]:
-        coll_dir = os.path.join(DATA_DIR, coll["short_name"])
+        coll_dir = os.path.join(DATA_DIR, "books", coll["short_name"])
         if not os.path.isdir(coll_dir):
             continue
 
