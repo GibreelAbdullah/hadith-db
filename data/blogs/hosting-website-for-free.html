@@ -1,0 +1,189 @@
+<article>
+  <h1>How I Hosted a Complete, High-Performance Web Application for $0/Month</h1>
+  <div class="subtitle">A guide to serverless static architectures: dynamic client routing, decoupled data repos, client-side search, and HTTP Range requests.</div>
+
+  <div class="meta">
+    <img src="https://avatars.githubusercontent.com/u/10581984" alt="Profile Pic" style="width: 40px; height: 40px; border-radius: 50%;">
+    <div>
+      <div><strong>Gibreel Abdullah</strong></div>
+      <div>6 min read</div>
+    </div>
+  </div>
+
+  <p>When building data-heavy web applications, developer instincts usually point straight to managed cloud infrastructure: spin up an AWS EC2 instance, plug in a PostgreSQL cluster, add an Elasticsearch nodes, and put an API gateway in front of it all.</p>
+
+  <p>The problem? Before you know it, you're paying $50 to $200 per month just keeping basic infrastructure alive—even before taking on any serious traffic.</p>
+
+  <p>I set out to build a fully functional, multi-language, searchable web platform containing tens of thousands of data records without spending a single dollar. Here is the technical breakdown of how to build, deploy, and host a modern web app for <strong>$0/month indefinitely</strong>.</p>
+
+  <figure>
+    <svg viewBox="0 0 800 400" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background: #0f172a; border-radius: 8px;">
+      <rect width="800" height="400" fill="#0f172a" />
+      <!-- GitHub Pages Box -->
+      <rect x="35" y="50" width="320" height="300" rx="10" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+      <text x="55" y="85" fill="#f8fafc" font-family="sans-serif" font-weight="bold" font-size="16">Frontend Repository (SPA)</text>
+      <rect x="55" y="110" width="280" height="40" rx="5" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6"/>
+      <text x="65" y="135" fill="#93c5fd" font-family="sans-serif" font-size="14">SvelteKit / React Static App</text>
+      <rect x="55" y="165" width="280" height="40" rx="5" fill="#10b981" fill-opacity="0.2" stroke="#10b981"/>
+      <text x="65" y="190" fill="#6ee7b7" font-family="sans-serif" font-size="14">Pre-compiled Pagefind Search Index</text>
+      <rect x="55" y="220" width="280" height="40" rx="5" fill="#f59e0b" fill-opacity="0.2" stroke="#f59e0b"/>
+      <text x="65" y="245" fill="#fde68a" font-family="sans-serif" font-size="14">Bundled App Meta & Layouts</text>
+
+      <!-- Data Box -->
+      <rect x="445" y="50" width="320" height="300" rx="10" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+      <text x="465" y="85" fill="#f8fafc" font-family="sans-serif" font-weight="bold" font-size="16">Data Repository (CDN)</text>
+      <rect x="465" y="110" width="280" height="60" rx="5" fill="#8b5cf6" fill-opacity="0.2" stroke="#8b5cf6"/>
+      <text x="475" y="135" fill="#c4b5fd" font-family="sans-serif" font-size="13">Raw Data Files (.txt / .json)</text>
+      <text x="475" y="155" fill="#94a3b8" font-family="sans-serif" font-size="11">Single flat line entries per item</text>
+      
+      <rect x="465" y="185" width="280" height="60" rx="5" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899"/>
+      <text x="475" y="210" fill="#fbcfe8" font-family="sans-serif" font-size="13">Byte Offsets Index (.json)</text>
+      <text x="475" y="230" fill="#94a3b8" font-family="sans-serif" font-size="11">Stores exact byte locations for range fetches</text>
+
+      <!-- Connection Line -->
+      <path d="M 357 200 L 445 200" stroke="#f43f5e" stroke-width="3" stroke-dasharray="5,5" />
+      <text x="360" y="190" fill="#f43f5e" font-family="sans-serif" font-size="10">Range Requests</text>
+    </svg>
+    <figcaption>Figure 1: High-level serverless architecture leveraging GitHub Pages for both app hosting and pseudo-database storage.</figcaption>
+  </figure>
+
+  <h2>1. The Core Architecture: Split UI and Data Repositories</h2>
+  <p>Most serverless implementations fail because they attempt to package all data into the static build bundle. If your application has thousands of data entries, bundling everything crashes your build pipelines and bloats initial page loads.</p>
+
+  <p>The solution is to separate concerns into two distinct GitHub repositories:</p>
+  <ul>
+    <li><strong>Frontend Repository:</strong> Contains application UI code (e.g., SvelteKit, Vue, or React), static site adapters, build steps, and UI layout components.</li>
+    <li><strong>Data Repository:</strong> Acts as a zero-cost database holding raw content (text files, JSON metadata, static site content, and structure maps).</li>
+  </ul>
+
+  <p>GitHub Pages hosts both. The application code fetches content on-demand from the data repository, effectively turning GitHub's static CDN into a content database.</p>
+
+  <h2>2. Solving the Database Problem: HTTP Byte-Range Requests</h2>
+  <p>How do you fetch a single record out of a 10MB text file on a static host without downloading the entire 10MB file on every user click?</p>
+
+  <p>By leveraging <strong>HTTP Byte-Range Requests</strong> (HTTP Header <code>Range: bytes=start-end</code>).</p>
+
+  <p>During data generation, we record the byte offsets for every line in our dataset and store them in a lightweight JSON index map:</p>
+
+  <pre><code>{
+  "collection": "dataset_a",
+  "offsets": {
+    "en": [0, 245, 1023, 1840, 2390],
+    "es": [0, 312, 987, 1720, 2510]
+  }
+}</code></pre>
+
+  <p>When a user navigates to item <code>#3</code>, the web app looks up the target byte ranges from the local metadata file, then executes an efficient range fetch directly against GitHub Pages:</p>
+
+  <pre><code>// Client-side fetch snippet querying specific byte offset
+async function fetchSingleRecord(url, startByte, endByte) {
+  const response = await fetch(url, {
+    headers: {
+      'Range': `bytes=${startByte}-${endByte}`
+    }
+  });
+  return await response.text();
+}</code></pre>
+
+  <p>Instead of pulling megabytes of data, the client downloads only the exact bytes required (~200 bytes), yielding instantaneous rendering and sub-millisecond response times for free.</p>
+
+  <h2>3. Routing Strategy: Single Page Application (SPA) Fallbacks</h2>
+  <p>Static file hosting like GitHub Pages does not come natively with server-side dynamic routing engines like Node.js or Express. If a user directly visits <code>example.com/category/item/42</code>, GitHub Pages will default to a <code>404 Not Found</code> error.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 180" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background: #0f172a; border: 1px solid #e2e8f0; border-radius: 8px;">
+      <rect x="30" y="40" width="160" height="100" rx="6" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-width="2"/>
+      <text x="110" y="80" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="#93c5fd">User Visit</text>
+      <text x="110" y="100" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#93c5fd">/deep/route/path</text>
+
+      <path d="M 190 90 L 250 90" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" />
+
+      <rect x="250" y="40" width="180" height="100" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="2"/>
+      <text x="340" y="80" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="#991b1b">GitHub Pages 404</text>
+      <text x="340" y="100" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#991b1b">Serves custom 404.html</text>
+
+      <path d="M 430 90 L 490 90" stroke="#94a3b8" stroke-width="2" />
+
+      <rect x="490" y="40" width="180" height="100" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+      <text x="580" y="80" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="14" fill="#166534">Client Router</text>
+      <text x="580" y="100" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#166534">Rehydrates dynamic view</text>
+    </svg>
+    <figcaption>Figure 2: SPA routing flow utilizing custom 404 fallback handling for client-side resolution.</figcaption>
+  </figure>
+
+  <p>To bypass this limitation:</p>
+  <ol>
+    <li>Build your frontend using static SPA generation mode (e.g., SvelteKit's <code>adapter-static</code> with <code>fallback: 'index.html'</code>).</li>
+    <li>Duplicate the output <code>index.html</code> file to a <code>404.html</code> file in your static build distribution root.</li>
+    <li>When a user requests a deep link directly, GitHub Pages serves <code>404.html</code> (which is identical to <code>index.html</code>). The browser executes your client-side JavaScript router, reads the window path, and renders the requested view seamlessly.</li>
+  </ol>
+
+  <h2>4. Zero-Server Full-Text Search Engine</h2>
+  <p>Traditional backend web development relies heavily on search servers like Elasticsearch, Algolia, or Meilisearch. Running these instances costs money, requires memory, and demands constant maintenance.</p>
+
+  <p>Instead, use static indexing tools such as <strong>Pagefind</strong>. During your CI/CD deployment phase, Pagefind parses compiled HTML/JSON content and breaks it down into static, highly-compressed WebAssembly search index chunks.</p>
+
+  <div class="highlight-box">
+    <h4>Why Pagefind?</h4>
+    <p>Pagefind builds micro-indexes. When a user types a search query in their browser, Pagefind downloads only the specific WebAssembly chunk required to complete the query—allowing instant client-side full-text search across large sites while using zero backend servers.</p>
+  </div>
+
+  <h2>5. Automation via GitHub Actions (CI/CD Pipeline)</h2>
+  <p>The entire pipeline runs hands-free through automated GitHub Actions workflows:</p>
+
+  <figure>
+    <svg viewBox="0 0 700 130" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" style="background: #1e1e2e; border-radius: 8px;">
+      <!-- Step 1 -->
+      <rect x="20" y="35" width="140" height="60" rx="6" fill="#313244" stroke="#45475a" stroke-width="2"/>
+      <text x="90" y="62" text-anchor="middle" fill="#cdd6f4" font-family="sans-serif" font-size="12" font-weight="bold">Data Commit</text>
+      <text x="90" y="78" text-anchor="middle" fill="#a6adc8" font-family="sans-serif" font-size="10">Repository Dispatch</text>
+
+      <path d="M 160 65 L 190 65" stroke="#a6adc8" stroke-width="2" />
+
+      <!-- Step 2 -->
+      <rect x="190" y="35" width="140" height="60" rx="6" fill="#313244" stroke="#45475a" stroke-width="2"/>
+      <text x="260" y="62" text-anchor="middle" fill="#cdd6f4" font-family="sans-serif" font-weight="bold" font-size="12">Build App</text>
+      <text x="260" y="78" text-anchor="middle" fill="#a6adc8" font-family="sans-serif" font-size="10">Fetch Metadata</text>
+
+      <path d="M 330 65 L 360 65" stroke="#a6adc8" stroke-width="2" />
+
+      <!-- Step 3 -->
+      <rect x="360" y="35" width="140" height="60" rx="6" fill="#313244" stroke="#45475a" stroke-width="2"/>
+      <text x="430" y="62" text-anchor="middle" fill="#cdd6f4" font-family="sans-serif" font-weight="bold" font-size="12">Pagefind Index</text>
+      <text x="430" y="78" text-anchor="middle" fill="#a6adc8" font-family="sans-serif" font-size="10">Compile WASM Index</text>
+
+      <path d="M 500 65 L 530 65" stroke="#a6adc8" stroke-width="2" />
+
+      <!-- Step 4 -->
+      <rect x="530" y="35" width="150" height="60" rx="6" fill="#a6e3a1" stroke="#a6e3a1" stroke-width="2"/>
+      <text x="605" y="62" text-anchor="middle" fill="#11111b" font-family="sans-serif" font-weight="bold" font-size="12">GitHub Pages</text>
+      <text x="605" y="78" text-anchor="middle" fill="#181825" font-family="sans-serif" font-size="10">Automated Deploy</text>
+    </svg>
+    <figcaption>Figure 3: Automated build and deployment pipeline triggered via cross-repository events.</figcaption>
+  </figure>
+
+  <p>Here is how the automated workflow operates:</p>
+  <ol>
+    <li>Updating content in the <strong>Data Repository</strong> triggers a <code>repository_dispatch</code> event to the <strong>Frontend Repository</strong>.</li>
+    <li>GitHub Actions pulls the updated application code and data schemas.</li>
+    <li>It compiles application assets, runs pre-rendering steps, builds search indices via Pagefind, and creates fallbacks for routing.</li>
+    <li>The output is published automatically to GitHub Pages.</li>
+  </ol>
+
+  <h2>Summary of Free Infrastructure Specs</h2>
+  <p>By stepping away from traditional server-based models and utilizing modern static tooling, you get high-end performance completely free:</p>
+
+  <ul>
+    <li><strong>Hosting:</strong> GitHub Pages ($0/mo)</li>
+    <li><strong>CI/CD Pipelines:</strong> GitHub Actions ($0/mo)</li>
+    <li><strong>Database & Content Storage:</strong> GitHub Git Data Repos ($0/mo)</li>
+    <li><strong>Search Engine:</strong> Pagefind WebAssembly static indexer ($0/mo)</li>
+    <li><strong>SSL & Global CDN Edge Distribution:</strong> Enforced by default ($0/mo)</li>
+  </ul>
+
+  <blockquote>
+    "Serverless static engineering isn't just about cutting costs—it forces you to write leaner, faster code that scales effortlessly to millions of users without infrastructure overhead."
+  </blockquote>
+
+  <p>If you are looking to build side projects, search engines, reference portals, or data platforms, skip complex cloud infrastructure setups. Embrace modern static architectures and keep your hosting bills at absolute zero.</p>
+</article>
