@@ -4,9 +4,7 @@ on:
   push:
     branches: [master]
     paths:
-      - 'books/**'
-      - 'master/**'
-      - 'sections/**'
+      - 'data/books/**'
       - 'convert.py'
       - '.github/workflows/**'
 
