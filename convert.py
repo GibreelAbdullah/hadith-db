@@ -163,10 +163,16 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
     else:
         lang_columns = sorted(lang_files.keys())
 
+    # Read each language file exactly once (perf: avoids O(books × filesize) re-reads)
+    lang_lines = {}
     for lang in lang_columns:
-        lines = open(lang_files[lang], "rb").read().decode("utf-8").split("\n")
-        if lines and lines[-1] == "":
-            lines = lines[:-1]
+        _lines = open(lang_files[lang], "rb").read().decode("utf-8").split("\n")
+        if _lines and _lines[-1] == "":
+            _lines = _lines[:-1]
+        lang_lines[lang] = _lines
+
+    for lang in lang_columns:
+        lines = lang_lines[lang]
 
         for rec in records:
             if rec["line"] >= len(lines):
@@ -180,6 +186,17 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
             elif rec["cat"] == "collection_intro":
                 collection_intro[lang] = text
 
+    # Pre-index records by book in a single pass (perf: avoids O(books × records))
+    book_hadiths_by_num = {}
+    book_rec_by_num = {}
+    for rec in records:
+        cat = rec.get("cat")
+        bnum = rec.get("book")
+        if cat == "hadith":
+            book_hadiths_by_num.setdefault(bnum, []).append(rec)
+        elif cat == "book" and bnum not in book_rec_by_num:
+            book_rec_by_num[bnum] = rec
+
     # Build books list with names and hadith ranges
     books_list = []
     book_numbers = []
@@ -187,16 +204,16 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         if rec["cat"] == "book":
             book_numbers.append(rec.get("book", ""))
 
+    import re
     for book_num in book_numbers:
         book_entry = {"number": book_num, "hadith_start": 0, "hadith_end": 0}
 
         # Get hadith range
-        book_hadiths = [r for r in records if r.get("cat") == "hadith" and r.get("book") == book_num]
+        book_hadiths = book_hadiths_by_num.get(book_num, [])
         if book_hadiths:
             nums = []
             for h in book_hadiths:
                 # Handle composite numbers like "272,273" or "5773-5775" or "884b,c"
-                import re
                 for part in re.split(r'[,\-]', h["num"]):
                     part = part.strip()
                     digits = "".join(c for c in part if c.isdigit())
@@ -207,10 +224,10 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
                 book_entry["hadith_end"] = max(nums)
 
         # Get book names from each language
-        book_rec = next((r for r in records if r["cat"] == "book" and r.get("book") == book_num), None)
+        book_rec = book_rec_by_num.get(book_num)
         if book_rec:
             for lang in lang_columns:
-                lines = open(lang_files[lang], "rb").read().decode("utf-8").split("\n")
+                lines = lang_lines[lang]
                 if book_rec["line"] < len(lines):
                     line = lines[book_rec["line"]]
                     second_pipe = line.find("|", line.find("|") + 1)
@@ -256,6 +273,10 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         "collection_info": collection_info,
         "collection_intro": collection_intro,
     }
+
+    # Pass through optional author info from collections.json (name / aka / died)
+    if coll_entry and coll_entry.get("author"):
+        metadata["author"] = coll_entry["author"]
 
     with open(os.path.join(coll_dir, "metadata.json"), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False)
