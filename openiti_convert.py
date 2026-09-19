@@ -67,6 +67,9 @@ HDR_NOPAREN_RE = re.compile(r"^#\s*\|\s*(.+?)\s*$", re.S)
 SUBHDR_RE = re.compile(r"^#{2,}\s*\|+\s*(\d+)?\s*\((.*)\)\s*$", re.S)
 # nested sub-header without parentheses, e.g. "### | باب ذكر ..."
 SUBHDR_NOPAREN_RE = re.compile(r"^#{2,}\s*\|+\s*(.+?)\s*$", re.S)
+# Capture the pipe run for a nested header so we can tell a section-level
+# "### |" (single pipe) from a chapter-level "### ||" (two or more pipes).
+SUBHDR_PIPES_RE = re.compile(r"^#{2,}\s*(\|+)")
 # page-only structural lines, e.g. "### | [ص: 52]" -> ignored, not a chapter
 PAGEREF_RE = re.compile(r"^#{2,}\s*\|+\s*\[[^\]]*\]\s*$", re.S)
 # paratext / empty structural markers, e.g. "### |PARATEXT|" -> ignored
@@ -412,10 +415,23 @@ def convert(text, collection_name, autonumber=False):
             if not title:
                 stats["skipped"] += 1
                 continue
-            # Even at the nested `###` level a كتاب heading introduces a real
-            # book (e.g. Ibn Abi Shayba marks its ~40 kutub as `### || كتاب ...`
-            # while everything else is a chapter). Classify accordingly.
-            if classify_section(clean_title(title)) == "book":
+            # Distinguish nesting depth by the pipe run:
+            #   "### |"  (single pipe) -> a section/book-level header
+            #   "### ||" (two+ pipes)  -> a chapter within the current book
+            pm = SUBHDR_PIPES_RE.match(marker)
+            single_pipe = bool(pm) and len(pm.group(1)) == 1
+            kind = classify_section(clean_title(title))
+            if kind == "book":
+                # An explicit كتاب heading is always a book (e.g. Ibn Abi
+                # Shayba's ~40 kutub marked "### || كتاب ...").
+                emit_book(title)
+            elif kind == "chapter":
+                emit_chapter(title)
+            elif single_pipe:
+                # Single-pipe section headers are book-level even without a
+                # كتاب keyword — e.g. Shu'ab al-Iman's 77 "شعب" branches
+                # ("الأول من شعب الإيمان ...") are marked "### |", while their
+                # "فصل" sub-sections are "### ||".
                 emit_book(title)
             else:
                 emit_chapter(title)
