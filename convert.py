@@ -98,6 +98,15 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
     books = {}
     collection_info = {}
     collection_intro = {}
+    # Sequential counter for `book` records that lack an explicit number in the
+    # source. Must NOT be derived from `books` (the hadith-count map), because
+    # that map only gains entries once hadiths are processed — so multiple book
+    # headers appearing before the first hadith would otherwise all collapse to
+    # the same number ("1"). See the OpenITI collections (Bayhaqi, Ibn Khuzayma)
+    # where consecutive كتاب/باب headers precede any hadith.
+    book_seq = 0
+    # Per-book sequential counter for `chapter` records that lack a number.
+    chapter_seq = {}
 
     for line_idx, line in enumerate(primary_lines):
         first_pipe = line.find("|")
@@ -117,7 +126,11 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         elif category == "collection_intro":
             pass
         elif category == "book":
-            record["book"] = num if num else str(len(books) + 1)
+            if num:
+                record["book"] = num
+            else:
+                book_seq += 1
+                record["book"] = str(book_seq)
         elif category == "book_intro":
             # Find which book this belongs to
             for prev_idx in range(line_idx - 1, -1, -1):
@@ -127,11 +140,19 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
                     break
         elif category == "chapter":
             # Find the current book
+            cur_book = None
             for prev_rec in reversed(records):
                 if prev_rec.get("cat") == "book":
-                    record["book"] = prev_rec["book"]
+                    cur_book = prev_rec["book"]
+                    record["book"] = cur_book
                     break
-            record["chapter"] = num
+            if num:
+                record["chapter"] = num
+            else:
+                # Auto-number chapters that lack an explicit number, scoped to
+                # their parent book, so each chapter has a unique id.
+                chapter_seq[cur_book] = chapter_seq.get(cur_book, 0) + 1
+                record["chapter"] = str(chapter_seq[cur_book])
         elif category == "chapter_intro":
             for prev_rec in reversed(records):
                 if prev_rec.get("cat") == "chapter":
@@ -163,10 +184,16 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
     else:
         lang_columns = sorted(lang_files.keys())
 
+    # Read each language file exactly once (perf: avoids O(books × filesize) re-reads)
+    lang_lines = {}
     for lang in lang_columns:
-        lines = open(lang_files[lang], "rb").read().decode("utf-8").split("\n")
-        if lines and lines[-1] == "":
-            lines = lines[:-1]
+        _lines = open(lang_files[lang], "rb").read().decode("utf-8").split("\n")
+        if _lines and _lines[-1] == "":
+            _lines = _lines[:-1]
+        lang_lines[lang] = _lines
+
+    for lang in lang_columns:
+        lines = lang_lines[lang]
 
         for rec in records:
             if rec["line"] >= len(lines):
@@ -180,6 +207,17 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
             elif rec["cat"] == "collection_intro":
                 collection_intro[lang] = text
 
+    # Pre-index records by book in a single pass (perf: avoids O(books × records))
+    book_hadiths_by_num = {}
+    book_rec_by_num = {}
+    for rec in records:
+        cat = rec.get("cat")
+        bnum = rec.get("book")
+        if cat == "hadith":
+            book_hadiths_by_num.setdefault(bnum, []).append(rec)
+        elif cat == "book" and bnum not in book_rec_by_num:
+            book_rec_by_num[bnum] = rec
+
     # Build books list with names and hadith ranges
     books_list = []
     book_numbers = []
@@ -187,30 +225,32 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         if rec["cat"] == "book":
             book_numbers.append(rec.get("book", ""))
 
+    import re
     for book_num in book_numbers:
         book_entry = {"number": book_num, "hadith_start": 0, "hadith_end": 0}
 
-        # Get hadith range
-        book_hadiths = [r for r in records if r.get("cat") == "hadith" and r.get("book") == book_num]
+        # Get hadith range. Use the FIRST and LAST hadith in document (reading)
+        # order rather than min/max of all numbers: many collections restart or
+        # do not number monotonically per book, so min/max produces misleading
+        # overlapping/backwards ranges. Document order is what a reader sees.
+        book_hadiths = book_hadiths_by_num.get(book_num, [])
         if book_hadiths:
-            nums = []
-            for h in book_hadiths:
-                # Handle composite numbers like "272,273" or "5773-5775" or "884b,c"
-                import re
+            def first_num(h):
                 for part in re.split(r'[,\-]', h["num"]):
-                    part = part.strip()
-                    digits = "".join(c for c in part if c.isdigit())
+                    digits = "".join(c for c in part.strip() if c.isdigit())
                     if digits:
-                        nums.append(int(digits))
-            if nums:
-                book_entry["hadith_start"] = min(nums)
-                book_entry["hadith_end"] = max(nums)
+                        return int(digits)
+                return None
+            firsts = [n for n in (first_num(book_hadiths[0]), first_num(book_hadiths[-1])) if n is not None]
+            if firsts:
+                book_entry["hadith_start"] = first_num(book_hadiths[0]) or firsts[0]
+                book_entry["hadith_end"] = first_num(book_hadiths[-1]) or firsts[-1]
 
         # Get book names from each language
-        book_rec = next((r for r in records if r["cat"] == "book" and r.get("book") == book_num), None)
+        book_rec = book_rec_by_num.get(book_num)
         if book_rec:
             for lang in lang_columns:
-                lines = open(lang_files[lang], "rb").read().decode("utf-8").split("\n")
+                lines = lang_lines[lang]
                 if book_rec["line"] < len(lines):
                     line = lines[book_rec["line"]]
                     second_pipe = line.find("|", line.find("|") + 1)
@@ -256,6 +296,10 @@ def process_collection(coll_dir, collection_short_name, gradings, collections_da
         "collection_info": collection_info,
         "collection_intro": collection_intro,
     }
+
+    # Pass through optional author info from collections.json (name / aka / died)
+    if coll_entry and coll_entry.get("author"):
+        metadata["author"] = coll_entry["author"]
 
     with open(os.path.join(coll_dir, "metadata.json"), "w", encoding="utf-8") as f:
         json.dump(metadata, f, ensure_ascii=False)
