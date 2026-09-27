@@ -16,6 +16,7 @@ Metadata index: OpenITI/kitab-metadata-automation → kitab_metadata_for_DLME_la
 | abu_yala        | 0307AbuYaclaMawsili.Musnad.JK000485-ara1      | https://raw.githubusercontent.com/openiti/release/master/data/0307AbuYaclaMawsili/0307AbuYaclaMawsili.Musnad/0307AbuYaclaMawsili.Musnad.JK000485-ara1 |
 | tayalisi        | 0204AbuDawudTayalisi.Musnad.JK000470-ara1     | https://raw.githubusercontent.com/openiti/release/master/data/0204AbuDawudTayalisi/0204AbuDawudTayalisi.Musnad/0204AbuDawudTayalisi.Musnad.JK000470-ara1 |
 | jami_saghir     | 0911Suyuti.JamicSaghir.Shia002261Vols-ara1    | https://raw.githubusercontent.com/openiti/release/master/data/0911Suyuti/0911Suyuti.JamicSaghir/0911Suyuti.JamicSaghir.Shia002261Vols-ara1 |
+| shafii          | 0204Shafici.Musnad.Shamela0009344-ara1        | https://raw.githubusercontent.com/OpenITI/0225AH/refs/heads/master/data/0204Shafici/0204Shafici.Musnad/0204Shafici.Musnad.Shamela0009344-ara1 |
 
 ## Bespoke converters
 
@@ -33,3 +34,13 @@ because their source format differs:
   branch headers -> books; `### |` باب/فصل -> chapters; `### | N -` hadith with
   text on following `#` lines). Chosen over the JK000021 (Dar al-Kutub
   al-Ilmiyya) edition to match the Shamela section layout.
+- **shafii** → `shafii_convert.py` (Shamela0009344, Dar al-Kutub al-Ilmiyya
+  edition). The source has *no* per-hadith numbering — each hadith is a plain
+  `#` isnad block — and is bracketed by non-hadith prose: a biographical
+  preface (نبذة عن الشافعي …) before the first `### |` section and a scribal
+  colophon (تم كتاب المسند …) after the last hadith. `openiti_convert.py
+  --autonumber` would wrongly number the preface/colophon blocks as hadith, so
+  the bespoke parser skips everything before the first section header and from
+  the colophon phrase onward, then numbers the body sequentially (68 books,
+  1 opening باب chapter, 1912 hadith). Reuses openiti_convert.py's cleaning
+  helpers.
