@@ -25,10 +25,14 @@ jobs:
       - name: Run conversion script
         run: python3 convert.py
 
-      - name: Commit and push generated data
+      - name: Commit and push generated gradings
+        # metadata.json is gitignored and NOT committed here — the frontend
+        # deploy regenerates it via convert.py after cloning this repo. Only
+        # gradings.json (fetched cross-origin from this repo's Pages) and any
+        # other non-ignored data changes are committed back.
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/
-          git diff --cached --quiet || git commit -m "chore: regenerate data"
+          git diff --cached --quiet || git commit -m "chore: regenerate gradings"
           git push
