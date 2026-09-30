@@ -131,7 +131,7 @@ chapter||
 hadith|104|<qbl>Anas said:</qbl><text>“Ihe pommel of the sword of Allah’s Messenger (ﷺ) was made of silver.”</text>
 hadith|105|<qbl>Sa'id ibn Abi’l-Hasan al-Basri said:</qbl><text>“The pommel of the sword of Allah’s Messenger (ﷺ) was made of silver."</text>
 hadith|106|<qbl>Hud (i.e. Ibn 'Abdi’llah ibn Sa'd) reports that his grandfather said:</qbl><text>"Allah’s Messenger (ﷺ) entered Mecca on the Day of Victory with gold and silver on his sword. An inquirer said: 'I asked him about the silver', and he said: ‘The pommel of the sword was silver'.”</text>
-hadith|107,108|<qbl>Ibn Sirin said:</qbl><text>"I made my sword in the shape of the sword of Samura ibn Jundub." Samura also claimed that he made his sword in the shape of the sword of Allah’s Messenger (ﷺ), for he was a Hanafi.</text>
+hadith|107,108|<qbl>Ibn Sirin said:</qbl><text>"I made my sword in the shape of the sword of Samura ibn Jundub." Samura also claimed that he made his sword in the shape of the sword of Allah’s Messenger (ﷺ), for it was a Hanafi.</text>
 book||The Armor Of Rasoolullah
 chapter||
 hadith|109|<qbl>Az-Zubair ibn al-'Awwam said:</qbl><text>"The Prophet (ﷺ) wore two coats of mail on the Day of Uhud, so he tried to climb the boulder but was not able. He therefore made Talha sit beneath him, and the Prophet (ﷺ), climbed up until he stood upright on the rock." He said: "I heard the Prophet (ﷺ) say (ﷺ): 'Talha performed a deed worthy of reward'!”</text>
